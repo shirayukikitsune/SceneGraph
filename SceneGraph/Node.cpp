@@ -47,3 +47,22 @@ kitsune::scenegraph::Component * Node::getComponent(std::size_t typehash)
 
 	return i->second.get();
 }
+
+std::shared_ptr<Node> Node::addChildNode()
+{
+	std::shared_ptr<Node> Node(new Node);
+
+	Node->ParentNode = shared_from_this();
+
+	ChildNodes.emplace(Node);
+
+	return Node;
+}
+
+std::shared_ptr<Node> Node::getParentNode()
+{
+	if (auto Lock = ParentNode.lock())
+		return Lock;
+
+	return std::shared_ptr<Node>();
+}

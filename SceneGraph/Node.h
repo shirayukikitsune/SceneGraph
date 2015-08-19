@@ -2,6 +2,7 @@
 
 #include <map>
 #include <memory>
+#include <set>
 
 namespace kitsune {
 namespace scenegraph {
@@ -9,6 +10,7 @@ namespace scenegraph {
 	class Component;
 
 	class Node
+		: public std::enable_shared_from_this<Node>
 	{
 	public:
 		Node();
@@ -35,10 +37,14 @@ namespace scenegraph {
 			return (T*)getComponent(T::componentNameHash);
 		}
 
-	protected:
+		std::shared_ptr<Node> addChildNode();
+
+		std::shared_ptr<Node> getParentNode();
 
 	private:
 		std::weak_ptr<Node> ParentNode;
+
+		std::set<std::shared_ptr<Node>> ChildNodes;
 
 		std::multimap<std::size_t, std::unique_ptr<Component>> Components;
 

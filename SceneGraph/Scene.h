@@ -56,7 +56,7 @@ namespace scenegraph {
 		///! The root node of the scene
 		///
 		/// \remarks This pointer is guaranteed to be valid (i.e., RootNode != nullptr) while the instance of this scene remains valid
-		std::unique_ptr<Node> RootNode;
+		std::shared_ptr<Node> RootNode;
 	};
 
 }
