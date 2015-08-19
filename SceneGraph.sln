@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SceneGraph", "SceneGraph\SceneGraph.vcxproj", "{AC4F1B8C-032E-4C37-BB2C-D783838A84B3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SceneGraph.Test", "SceneGraph.Test\SceneGraph.Test.vcxproj", "{78070F77-D971-4A5E-A61E-2F2B079A7E94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{AC4F1B8C-032E-4C37-BB2C-D783838A84B3}.Release|x64.Build.0 = Release|x64
 		{AC4F1B8C-032E-4C37-BB2C-D783838A84B3}.Release|x86.ActiveCfg = Release|Win32
 		{AC4F1B8C-032E-4C37-BB2C-D783838A84B3}.Release|x86.Build.0 = Release|Win32
+		{78070F77-D971-4A5E-A61E-2F2B079A7E94}.Debug|x64.ActiveCfg = Debug|x64
+		{78070F77-D971-4A5E-A61E-2F2B079A7E94}.Debug|x64.Build.0 = Debug|x64
+		{78070F77-D971-4A5E-A61E-2F2B079A7E94}.Debug|x86.ActiveCfg = Debug|Win32
+		{78070F77-D971-4A5E-A61E-2F2B079A7E94}.Debug|x86.Build.0 = Debug|Win32
+		{78070F77-D971-4A5E-A61E-2F2B079A7E94}.Release|x64.ActiveCfg = Release|x64
+		{78070F77-D971-4A5E-A61E-2F2B079A7E94}.Release|x64.Build.0 = Release|x64
+		{78070F77-D971-4A5E-A61E-2F2B079A7E94}.Release|x86.ActiveCfg = Release|Win32
+		{78070F77-D971-4A5E-A61E-2F2B079A7E94}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
