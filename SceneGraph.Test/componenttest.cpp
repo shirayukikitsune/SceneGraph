@@ -64,5 +64,23 @@ namespace SceneGraphTest
 			Assert::IsNull(Node->getComponent<InvalidComponent>(), L"Component found");
 		}
 
+		TEST_METHOD(NodeDeleteComponent)
+		{
+			std::shared_ptr<kitsune::scenegraph::Node> Node(new kitsune::scenegraph::Node);
+			std::unique_ptr<sg::Component> Component(new sg::Component(Node));
+
+			Node->addComponent(Component.get());
+
+			Node.reset();
+
+			try {
+				Component.reset(); // This should throw an access violation
+
+				Assert::IsFalse(true, L"Component not deleted");
+			}
+			catch (...) {
+			}
+		}
+
 	};
 }
