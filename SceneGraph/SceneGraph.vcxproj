@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Callback.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Node.h" />

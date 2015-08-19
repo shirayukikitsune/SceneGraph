@@ -29,5 +29,8 @@
     <ClCompile Include="componenttest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scenetest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -23,6 +23,7 @@ namespace scenegraph {
 
 		bool isLocalActive() const { return Active; }
 		bool isActive() const;
+		void setActive(bool State) { Active = State; }
 
 	private:
 		std::weak_ptr<Node> Node;

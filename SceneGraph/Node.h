@@ -16,6 +16,7 @@ namespace scenegraph {
 
 		bool isLocalActive() const { return Active; }
 		bool isActive() const;
+		void setActive(bool State) { Active = State; }
 
 		void addComponent(std::size_t typehash, Component * Component);
 		bool hasComponent(std::size_t typehash);
