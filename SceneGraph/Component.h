@@ -1,8 +1,12 @@
 #pragma once
 
+#include "Hash.h"
 #include "Node.h"
 
 #include <memory>
+
+#define KIT_SG_COMPONENT_NAME(t) #t
+#define KIT_SG_COMPONENT(t) public: constexpr static std::size_t componentNameHash = KIT_SG_COMPONENT_NAME(t)_hash;
 
 namespace kitsune {
 namespace scenegraph {
@@ -11,6 +15,8 @@ namespace scenegraph {
 
 	class Component
 	{
+		KIT_SG_COMPONENT(kitsune::scenegraph::Component);
+
 	public:
 		Component(std::shared_ptr<Node> Node);
 		virtual ~Component();
