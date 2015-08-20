@@ -17,8 +17,9 @@ namespace SceneGraphTest
 		TEST_METHOD(SceneUpdateEvent)
 		{
 			bool updated = false;
-			std::unique_ptr<sg::Scene> Scene(new sg::Scene);
-			sg::Scene::updateCallback::auto_remover_type updateEvent = Scene->addUpdateEvent([&updated](float DeltaTime) {
+			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+			Scene->initialize();
+			auto updateEvent = Scene->addUpdateEvent([&updated](float DeltaTime) {
 				Assert::AreEqual(100.0f, DeltaTime, 0.0f, L"Invalid DeltaTime");
 				updated = true;
 			});
@@ -31,8 +32,9 @@ namespace SceneGraphTest
 		TEST_METHOD(ScenePreUpdateEvent)
 		{
 			bool updated = false;
-			std::unique_ptr<sg::Scene> Scene(new sg::Scene);
-			sg::Scene::updateCallback::auto_remover_type preUpdateEvent = Scene->addPreUpdateEvent([&updated](float DeltaTime) {
+			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+			Scene->initialize();
+			auto preUpdateEvent = Scene->addPreUpdateEvent([&updated](float DeltaTime) {
 				Assert::AreEqual(100.0f, DeltaTime, 0.0f, L"Invalid DeltaTime");
 				updated = true;
 			});
@@ -45,12 +47,13 @@ namespace SceneGraphTest
 		TEST_METHOD(SceneUpdateOrder)
 		{
 			unsigned int updated = 0;
-			std::unique_ptr<sg::Scene> Scene(new sg::Scene);
-			sg::Scene::updateCallback::auto_remover_type preUpdateEvent = Scene->addPreUpdateEvent([&updated](float DeltaTime) {
+			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+			Scene->initialize();
+			auto preUpdateEvent = Scene->addPreUpdateEvent([&updated](float DeltaTime) {
 				Assert::AreEqual(100.0f, DeltaTime, 0.0f, L"Invalid DeltaTime");
 				updated = 1;
 			});
-			sg::Scene::updateCallback::auto_remover_type updateEvent = Scene->addUpdateEvent([&updated](float DeltaTime) {
+			auto updateEvent = Scene->addUpdateEvent([&updated](float DeltaTime) {
 				Assert::AreEqual(100.0f, DeltaTime, 0.0f, L"Invalid DeltaTime");
 				Assert::IsTrue(updated == 1, L"Invalid update order (update ran before pre-update)");
 				updated = 2;
@@ -64,7 +67,8 @@ namespace SceneGraphTest
 
 		TEST_METHOD(SceneHasRootNode)
 		{
-			std::unique_ptr<sg::Scene> Scene(new sg::Scene);
+			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+			Scene->initialize();
 			
 			Assert::IsNotNull(Scene->getRootNode(), L"Scene without root node");
 		}

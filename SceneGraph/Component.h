@@ -25,6 +25,10 @@ namespace scenegraph {
 		bool isActive() const;
 		void setActive(bool State) { Active = State; }
 
+		std::shared_ptr<Node> getNode();
+
+		std::shared_ptr<Scene> getScene();
+
 	private:
 		std::weak_ptr<Node> Node;
 		

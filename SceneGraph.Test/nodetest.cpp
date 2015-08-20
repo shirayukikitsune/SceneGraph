@@ -16,7 +16,8 @@ namespace SceneGraphTest
 	public:
 		TEST_METHOD(AddChildNode)
 		{
-			std::unique_ptr<sg::Scene> Scene(new sg::Scene);
+			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+			Scene->initialize();
 
 			auto RootNode = Scene->getRootNode();
 

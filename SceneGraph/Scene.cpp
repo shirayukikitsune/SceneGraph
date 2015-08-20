@@ -6,7 +6,6 @@ using kitsune::scenegraph::Scene;
 
 Scene::Scene()
 {
-	RootNode.reset(new kitsune::scenegraph::Node);
 }
 
 Scene::~Scene()
@@ -16,6 +15,8 @@ Scene::~Scene()
 void Scene::initialize()
 {
 	onPreInit();
+
+	RootNode.reset(new kitsune::scenegraph::Node(shared_from_this()));
 
 	onInit();
 }

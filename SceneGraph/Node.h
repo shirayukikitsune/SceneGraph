@@ -8,12 +8,13 @@ namespace kitsune {
 namespace scenegraph {
 
 	class Component;
+	class Scene;
 
 	class Node
 		: public std::enable_shared_from_this<Node>
 	{
 	public:
-		Node();
+		Node(std::weak_ptr<Scene> Scene);
 		~Node();
 
 		bool isLocalActive() const { return Active; }
@@ -24,6 +25,14 @@ namespace scenegraph {
 		bool hasComponent(std::size_t typehash);
 		Component * getComponent(std::size_t typehash);
 
+		template <class T>
+		T * createComponent() {
+			T * ptr = new T(shared_from_this());
+
+			addComponent<T>(ptr);
+
+			return ptr;
+		}
 		template <class T>
 		void addComponent(T * Component) {
 			addComponent(T::componentNameHash, Component);
@@ -41,8 +50,11 @@ namespace scenegraph {
 
 		std::shared_ptr<Node> getParentNode();
 
+		std::shared_ptr<Scene> getScene();
+
 	private:
 		std::weak_ptr<Node> ParentNode;
+		std::weak_ptr<Scene> Scene;
 
 		std::set<std::shared_ptr<Node>> ChildNodes;
 

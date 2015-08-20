@@ -1,8 +1,9 @@
 #pragma once
-#include <functional>
-#include <list>
-#include <map>
+
 #include <algorithm>
+#include <functional>
+#include <map>
+#include <memory>
 
 namespace kitsune {
 namespace scenegraph {
@@ -215,14 +216,14 @@ namespace scenegraph {
 	{
 	public:
 		typedef class auto_callback<R(ArgTypes...)> _Myt;
-		typedef class helper::auto_remover<_Myt> auto_remover_type;
+		typedef class std::unique_ptr<helper::auto_remover<_Myt>> auto_remover_type;
 
 		auto_remover_type push_auto(const function_type &fn) {
-			return auto_remover_type(this->push(fn), this);
+			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 
 		auto_remover_type push_auto(function_type && fn) {
-			return auto_remover_type(this->push(fn), this);
+			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 	};
 
@@ -232,14 +233,14 @@ namespace scenegraph {
 	{
 	public:
 		typedef class auto_callback<void(ArgTypes...)> _Myt;
-		typedef class helper::auto_remover<_Myt> auto_remover_type;
+		typedef class std::unique_ptr<helper::auto_remover<_Myt>> auto_remover_type;
 
 		auto_remover_type push_auto(const function_type &fn) {
-			return auto_remover_type(this->push(fn), this);
+			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 
-		auto_remover_type push_auto(function_type && fn) {
-			return auto_remover_type(this->push(fn), this);
+		std::shared_ptr<auto_remover_type> push_auto(function_type && fn) {
+			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 	};
 }

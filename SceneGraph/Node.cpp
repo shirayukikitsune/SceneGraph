@@ -4,7 +4,8 @@
 
 using kitsune::scenegraph::Node;
 
-Node::Node()
+Node::Node(std::weak_ptr<kitsune::scenegraph::Scene> Scene)
+	: Scene(Scene)
 {
 	Active = true;
 }
@@ -50,7 +51,7 @@ kitsune::scenegraph::Component * Node::getComponent(std::size_t typehash)
 
 std::shared_ptr<Node> Node::addChildNode()
 {
-	std::shared_ptr<Node> Node(new Node);
+	std::shared_ptr<Node> Node(new Node(this->Scene));
 
 	Node->ParentNode = shared_from_this();
 
@@ -65,4 +66,12 @@ std::shared_ptr<Node> Node::getParentNode()
 		return Lock;
 
 	return std::shared_ptr<Node>();
+}
+
+std::shared_ptr<kitsune::scenegraph::Scene> Node::getScene()
+{
+	if (auto Scene = this->Scene.lock())
+		return Scene;
+
+	return std::shared_ptr<kitsune::scenegraph::Scene>();
 }
