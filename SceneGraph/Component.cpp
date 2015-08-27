@@ -27,7 +27,7 @@ bool Component::isActive() const
 	return true;
 }
 
-std::shared_ptr<sg::Node> kitsune::scenegraph::Component::getNode()
+std::shared_ptr<sg::Node> Component::getNode()
 {
 	if (auto Node = this->Node.lock())
 		return Node;
@@ -35,7 +35,7 @@ std::shared_ptr<sg::Node> kitsune::scenegraph::Component::getNode()
 	return std::shared_ptr<sg::Node>();
 }
 
-std::shared_ptr<sg::Scene> kitsune::scenegraph::Component::getScene()
+std::shared_ptr<sg::Scene> Component::getScene()
 {
 	if (auto Scene = this->Scene.lock())
 		return Scene;

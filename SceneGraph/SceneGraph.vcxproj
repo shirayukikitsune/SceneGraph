@@ -69,7 +69,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)..\xbeat\Third Party\bullet3\src;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)..\xbeat\Third Party\bullet3\src;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)..\xbeat\Third Party\bullet3\src;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)..\xbeat\Third Party\bullet3\src;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -139,14 +150,30 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="Hash.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="PhysicsScene.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneEventComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="PhysicsScene.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneEventComponent.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\xbeat\Third Party\bullet3\build3\vs2010\BulletCollision.vcxproj">
+      <Project>{c917a137-b746-ea46-902a-6f85935fc861}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xbeat\Third Party\bullet3\build3\vs2010\BulletDynamics.vcxproj">
+      <Project>{aad7e714-87c5-3b49-8d38-56b2d6c10af8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xbeat\Third Party\bullet3\build3\vs2010\BulletSoftBody.vcxproj">
+      <Project>{d0e0dac5-8b9a-d443-9315-89ef1f4b2c9b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xbeat\Third Party\bullet3\build3\vs2010\LinearMath.vcxproj">
+      <Project>{69f30f08-c581-7343-8a4d-ad0854ae08bb}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

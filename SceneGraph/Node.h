@@ -4,6 +4,8 @@
 #include <memory>
 #include <set>
 
+#include <LinearMath/btTransform.h>
+
 namespace kitsune {
 namespace scenegraph {
 
@@ -25,9 +27,9 @@ namespace scenegraph {
 		bool hasComponent(std::size_t typehash);
 		Component * getComponent(std::size_t typehash);
 
-		template <class T>
-		T * createComponent() {
-			T * ptr = new T(shared_from_this());
+		template <class T, class... ArgTypes>
+		T * createComponent(ArgTypes... args) {
+			T * ptr = new T(shared_from_this(), args...);
 
 			addComponent<T>(ptr);
 
@@ -52,7 +54,30 @@ namespace scenegraph {
 
 		std::shared_ptr<Scene> getScene();
 
+		const btTransform & getWorldTransform();
+		void setWorldTransform(const btTransform & transform);
+
+		const btTransform & getLocalTransform() const { return LocalTransform; }
+		void setLocalTransform(const btTransform & transform) { LocalTransform = transform; invalidate(); }
+
+		btTransform getTransformToOrigin();
+
+		btVector3 getLocalOffset() const { return LocalTransform.getOrigin(); }
+		void setLocalOffset(const btVector3 & offset) { LocalTransform.setOrigin(offset); invalidate(); }
+
+		btQuaternion getLocalRotation() const { return LocalTransform.getRotation(); }
+		void setLocalRotation(const btQuaternion & rotation) { LocalTransform.setRotation(rotation); invalidate(); }
+
+		void resetTransform();
+
+	protected:
+		void invalidate();
+
 	private:
+		btTransform LocalTransform;
+		btTransform WorldTransform;
+		bool RecalculateWorld;
+
 		std::weak_ptr<Node> ParentNode;
 		std::weak_ptr<Scene> Scene;
 

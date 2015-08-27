@@ -17,7 +17,7 @@ namespace scenegraph {
 		typedef auto_callback<void(float)> updateCallback;
 
 		Scene();
-		~Scene();
+		virtual ~Scene();
 
 		///! Prepares the scene, creating all associated resources
 		void initialize();

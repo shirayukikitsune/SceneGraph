@@ -13,38 +13,56 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Components">
+      <UniqueIdentifier>{fbfff661-fc66-4030-bb56-6a6bed05ce18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Base">
+      <UniqueIdentifier>{3aca8c61-08ec-4b04-b9c2-a0a0c237ec4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Base">
+      <UniqueIdentifier>{724cef9a-7b3c-4734-a929-de7afb89591a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Components">
+      <UniqueIdentifier>{329f75b6-d878-43d4-a1c2-cf66f5be0a17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Node.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Callback.h">
+      <Filter>Header Files\Base</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Base</Filter>
     </ClInclude>
     <ClInclude Include="Hash.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Callback.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\Base</Filter>
     </ClInclude>
     <ClInclude Include="SceneEventComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Files\Base</Filter>
     </ClCompile>
     <ClCompile Include="Node.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\Base</Filter>
     </ClCompile>
     <ClCompile Include="SceneEventComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
