@@ -1,0 +1,59 @@
+#pragma once
+
+#include "Component.h"
+
+class btRigidBody;
+
+namespace kitsune {
+namespace scenegraph {
+
+	class RigidBodyComponent :
+		public Component
+	{
+		KIT_SG_COMPONENT(kitsune::scenegraph::RigidBodyComponent);
+
+	public:
+		RigidBodyComponent(std::shared_ptr<kitsune::scenegraph::Node> Node);
+		virtual ~RigidBodyComponent();
+
+		void setGroup(short Group);
+		short getGroup() const { return Group; }
+
+		void setMask(short Mask);
+		short getMask() const { return Mask; }
+
+		void setMass(float Mass);
+		float getMass() const { return ConstructionInfo.m_mass; }
+
+		void setDamping(float LinearDamping, float AngularDamping);
+
+		void setLinearDamping(float Damping);
+		float getLinearDamping() const { return ConstructionInfo.m_linearDamping; }
+
+		void setAngularDamping(float Damping);
+		float getAngularDamping() const { return ConstructionInfo.m_angularDamping; }
+
+		void setFriction(float Friction);
+		float getFriction() const { return ConstructionInfo.m_friction; }
+
+		void setRestitution(float Restitution);
+		float getRestitution() const { return ConstructionInfo.m_restitution; }
+
+	private:
+		btRigidBody::btRigidBodyConstructionInfo ConstructionInfo;
+
+		std::unique_ptr<btRigidBody> RigidBody;
+
+		short Group;
+		
+		short Mask;
+
+		void readdBodyToWorld();
+		void removeBodyFromWorld();
+
+	protected:
+		virtual void onNodeSet();
+	};
+
+}
+}

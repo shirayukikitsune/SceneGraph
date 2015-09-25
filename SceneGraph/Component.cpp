@@ -4,11 +4,9 @@ using kitsune::scenegraph::Component;
 namespace sg = kitsune::scenegraph;
 
 Component::Component(std::shared_ptr<sg::Node> Node)
-	: Node(Node)
+	: Active(true)
 {
-	Active = true;
-
-	this->Scene = Node ? Node->getScene() : nullptr;
+	setNode(Node);
 }
 
 Component::~Component()
@@ -27,6 +25,23 @@ bool Component::isActive() const
 	return true;
 }
 
+void Component::initialize()
+{
+}
+
+void Component::setNode(std::weak_ptr<sg::Node> Node)
+{
+	this->Node = Node;
+
+	if (auto NodePtr = Node.lock())
+		this->Scene = NodePtr->getScene();
+	else
+		this->Scene.reset();
+
+	onNodeSet();
+	onNodeSetEvent(Node);
+}
+
 std::shared_ptr<sg::Node> Component::getNode()
 {
 	if (auto Node = this->Node.lock())
@@ -41,4 +56,14 @@ std::shared_ptr<sg::Scene> Component::getScene()
 		return Scene;
 
 	return std::shared_ptr<sg::Scene>();
+}
+
+Component::onNodeSetCallback::auto_remover_type Component::addOnNodeSetEvent(onNodeSetCallback::function_type && function)
+{
+	return onNodeSetEvent.push_auto(function);
+}
+
+Component::onNodeSetCallback::auto_remover_type Component::addOnNodeSetEvent(const onNodeSetCallback::function_type & function)
+{
+	return onNodeSetEvent.push_auto(function);
 }

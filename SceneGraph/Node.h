@@ -12,11 +12,11 @@ namespace scenegraph {
 	class Component;
 	class Scene;
 
-	class Node
+	class alignas(16) Node
 		: public std::enable_shared_from_this<Node>
 	{
 	public:
-		Node(std::weak_ptr<Scene> Scene);
+		Node(std::weak_ptr<Scene> Scene = std::weak_ptr<kitsune::scenegraph::Scene>());
 		~Node();
 
 		bool isLocalActive() const { return Active; }
@@ -69,6 +69,8 @@ namespace scenegraph {
 		void setLocalRotation(const btQuaternion & rotation) { LocalTransform.setRotation(rotation); invalidate(); }
 
 		void resetTransform();
+
+		BT_ALIGNED_ALLOCATOR
 
 	protected:
 		void invalidate();

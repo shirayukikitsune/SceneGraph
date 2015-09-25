@@ -34,10 +34,14 @@ namespace SceneGraphTest
 
 		virtual void onPreUpdate(float DeltaTime) {
 			updated = 1;
+
+			sg::SceneEventComponent::onPreUpdate(DeltaTime);
 		}
 
 		virtual void onUpdate(float DeltaTime) {
 			updated = 2;
+
+			sg::SceneEventComponent::onUpdate(DeltaTime);
 		}
 
 		virtual uint32_t getAttachedEvents() { return (uint32_t)AttachedEvents::PreUpdate | (uint32_t)AttachedEvents::Update; }
@@ -46,6 +50,41 @@ namespace SceneGraphTest
 	TEST_CLASS(ComponentTest)
 	{
 	public:
+
+		TEST_METHOD(ComponentIsActive)
+		{
+			sg::Component *Component = new sg::Component(nullptr);
+
+			Assert::IsTrue(Component->isLocalActive(), L"Component is not locally active");
+			Assert::IsTrue(Component->isActive(), L"Component is not active");
+
+			Component->setActive(false);
+
+			Assert::IsFalse(Component->isLocalActive(), L"Component is locally active");
+			Assert::IsFalse(Component->isActive(), L"Component is active");
+		}
+
+		TEST_METHOD(NodeComponentIsActive)
+		{
+			std::shared_ptr<sg::Node> Node(new sg::Node());
+			auto Component = Node->createComponent<sg::Component>();
+
+			Assert::IsNotNull(Component, L"Failed to create component");
+
+			Assert::IsTrue(Node->isActive(), L"Node is not active");
+			Assert::IsTrue(Component->isActive(), L"Component is not active");
+
+			Node->setActive(false);
+
+			Assert::IsFalse(Component->isActive(), L"Component is active");
+			Assert::IsTrue(Component->isLocalActive(), L"Component is not locally active");
+
+			Node->setActive(true);
+			Component->setActive(false);
+
+			Assert::IsFalse(Component->isActive(), L"Component is active");
+			Assert::IsFalse(Component->isLocalActive(), L"Component is locally active");
+		}
 		
 		TEST_METHOD(NodeHasComponent)
 		{
@@ -84,6 +123,25 @@ namespace SceneGraphTest
 			Node->addComponent(Component);
 
 			Assert::IsNotNull(Node->getComponent<sg::Component>(), L"Component not found");
+		}
+
+		TEST_METHOD(ComponentHasNodeAndScene)
+		{
+			sg::Component *Component = new sg::Component(nullptr);
+
+			Assert::IsTrue(Component->getScene() == nullptr, L"Component belongs to a scene");
+			Assert::IsTrue(Component->getNode() == nullptr, L"Component belongs to a node");
+
+			delete Component;
+
+			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+			Scene->initialize();
+
+			auto Node = Scene->getRootNode();
+			Component = Node->createComponent<sg::Component>();
+
+			Assert::IsFalse(Component->getScene() == nullptr, L"Component doesn't belongs to a scene");
+			Assert::IsFalse(Component->getNode() == nullptr, L"Component doesn't belongs to a node");
 		}
 
 		TEST_METHOD(NodeGetInvalidComponent)

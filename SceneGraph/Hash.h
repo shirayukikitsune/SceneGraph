@@ -24,7 +24,7 @@ namespace scenegraph {
 			return hasher< typename std::decay<T>::type >()(std::forward<T>(t));
 		}
 		inline namespace literals {
-			std::size_t constexpr operator "" _hash(const char* s, size_t) {
+			std::size_t constexpr operator "" _hash(char const * s, const size_t) {
 				return hasher<std::string>()(s);
 			}
 		}

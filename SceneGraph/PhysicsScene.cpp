@@ -24,6 +24,11 @@ void PhysicsScene::setGravity(const btVector3 & Gravity)
 		DynamicsWorld->setGravity(Gravity);
 }
 
+btSoftRigidDynamicsWorld * PhysicsScene::getWorld()
+{
+	return DynamicsWorld.get();
+}
+
 void PhysicsScene::onInit()
 {
 	Broadphase.reset(new btDbvtBroadphase);

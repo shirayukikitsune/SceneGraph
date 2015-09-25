@@ -22,7 +22,7 @@
     <ProjectGuid>{78070F77-D971-4A5E-A61E-2F2B079A7E94}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SceneGraphTest</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

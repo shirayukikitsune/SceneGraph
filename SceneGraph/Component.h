@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Callback.h"
 #include "Hash.h"
 #include "Node.h"
 
@@ -18,6 +19,8 @@ namespace scenegraph {
 		KIT_SG_COMPONENT(kitsune::scenegraph::Component);
 
 	public:
+		typedef auto_callback<void(std::weak_ptr<Node>)> onNodeSetCallback;
+
 		Component(std::shared_ptr<Node> Node);
 		virtual ~Component();
 
@@ -25,9 +28,15 @@ namespace scenegraph {
 		bool isActive() const;
 		void setActive(bool State) { Active = State; }
 
+		virtual void initialize();
+
+		void setNode(std::weak_ptr<Node> Node);
 		std::shared_ptr<Node> getNode();
 
 		std::shared_ptr<Scene> getScene();
+
+		onNodeSetCallback::auto_remover_type addOnNodeSetEvent(onNodeSetCallback::function_type && function);
+		onNodeSetCallback::auto_remover_type addOnNodeSetEvent(const onNodeSetCallback::function_type & function);
 
 	private:
 		std::weak_ptr<Node> Node;
@@ -35,6 +44,11 @@ namespace scenegraph {
 		std::weak_ptr<Scene> Scene;
 
 		bool Active;
+
+		onNodeSetCallback onNodeSetEvent;
+
+	protected:
+		virtual void onNodeSet() {}
 	};
 
 }

@@ -16,6 +16,8 @@ namespace scenegraph {
 
 		void setGravity(const btVector3 & Gravity);
 
+		btSoftRigidDynamicsWorld * getWorld();
+
 	protected:
 		virtual void onInit();
 
