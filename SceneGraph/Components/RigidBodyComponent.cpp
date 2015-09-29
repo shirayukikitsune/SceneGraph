@@ -52,7 +52,7 @@ namespace scenegraph {
 }
 
 RigidBodyComponent::RigidBodyComponent(float Mass, RigidBodyType Type)
-	: Group(0), Mask(0xFFFF), ConstructionInfo(Mass, new bulletMotionState, nullptr), Type(Type)
+	: Group(1), Mask(0xFFFF), ConstructionInfo(Mass, new bulletMotionState, nullptr), Type(Type)
 {
 	DefaultShape.reset(new btEmptyShape);
 	RigidBody.reset(new btRigidBody(ConstructionInfo));
@@ -229,6 +229,6 @@ void RigidBodyComponent::onNodeSet()
 		RigidBody->setMassProps(ConstructionInfo.m_mass, ConstructionInfo.m_localInertia);
 	}
 
-	if (RigidBody->getBroadphaseHandle() == nullptr)
-		physicsScene->getWorld()->addRigidBody(RigidBody.get(), Group, Mask);
+	physicsScene->getWorld()->removeRigidBody(RigidBody.get());
+	physicsScene->getWorld()->addRigidBody(RigidBody.get(), Group, Mask);
 }
