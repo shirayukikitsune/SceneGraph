@@ -21,7 +21,7 @@ namespace scenegraph {
 	public:
 		typedef auto_callback<void(std::weak_ptr<Node>)> onNodeSetCallback;
 
-		Component(std::shared_ptr<Node> Node);
+		Component();
 		virtual ~Component();
 
 		bool isLocalActive() const { return Active; }

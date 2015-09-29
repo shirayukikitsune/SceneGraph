@@ -2,8 +2,7 @@
 
 using kitsune::scenegraph::SceneEventComponent;
 
-SceneEventComponent::SceneEventComponent(std::shared_ptr<kitsune::scenegraph::Node> Node)
-	: Component(Node)
+SceneEventComponent::SceneEventComponent()
 {
 }
 

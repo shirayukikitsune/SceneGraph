@@ -3,10 +3,9 @@
 using kitsune::scenegraph::Component;
 namespace sg = kitsune::scenegraph;
 
-Component::Component(std::shared_ptr<sg::Node> Node)
+Component::Component()
 	: Active(true)
 {
-	setNode(Node);
 }
 
 Component::~Component()

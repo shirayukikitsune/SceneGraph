@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Callback.h"
+
 #include <map>
 #include <memory>
 #include <set>
@@ -16,6 +18,8 @@ namespace scenegraph {
 		: public std::enable_shared_from_this<Node>
 	{
 	public:
+		typedef auto_callback<void(void)> invalidatedByParentCallback;
+
 		Node(std::weak_ptr<Scene> Scene = std::weak_ptr<kitsune::scenegraph::Scene>());
 		~Node();
 
@@ -29,7 +33,8 @@ namespace scenegraph {
 
 		template <class T, class... ArgTypes>
 		T * createComponent(ArgTypes... args) {
-			T * ptr = new T(shared_from_this(), args...);
+			T * ptr = new T(args...);
+			ptr->setNode(shared_from_this());
 
 			addComponent<T>(ptr);
 
@@ -70,7 +75,8 @@ namespace scenegraph {
 
 		void resetTransform();
 
-		BT_ALIGNED_ALLOCATOR
+		invalidatedByParentCallback::auto_remover_type addInvalidatedByParentEvent(invalidatedByParentCallback::function_type && function);
+		invalidatedByParentCallback::auto_remover_type addInvalidatedByParentEvent(const invalidatedByParentCallback::function_type & function);
 
 	protected:
 		void invalidate();
@@ -88,6 +94,8 @@ namespace scenegraph {
 		std::multimap<std::size_t, std::unique_ptr<Component>> Components;
 
 		bool Active;
+
+		invalidatedByParentCallback invalidatedByParentEvent;
 	};
 
 }

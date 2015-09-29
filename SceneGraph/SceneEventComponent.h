@@ -20,7 +20,7 @@ namespace scenegraph {
 			Update
 		};
 
-		SceneEventComponent(std::shared_ptr<kitsune::scenegraph::Node> Node);
+		SceneEventComponent();
 		virtual ~SceneEventComponent();
 
 		virtual void onPreUpdate(float DeltaTime) {}

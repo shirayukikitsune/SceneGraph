@@ -12,8 +12,8 @@ namespace scenegraph {
 		struct hasher<std::string> {
 			std::size_t constexpr operator()(char const *input)const {
 				return *input ?
-					static_cast<std::size_t>(*input) + 33LL * (*this)(input + 1) :
-					5381;
+					static_cast<std::size_t>(*input) + 33LL * (std::size_t)((*this)(input + 1)) :
+					5381LL;
 			}
 			std::size_t operator()(const std::string& str) const {
 				return (*this)(str.c_str());

@@ -2,7 +2,7 @@
 
 #include "Component.h"
 
-class btRigidBody;
+#include <BulletDynamics/Dynamics/btRigidBody.h>
 
 namespace kitsune {
 namespace scenegraph {
@@ -13,7 +13,13 @@ namespace scenegraph {
 		KIT_SG_COMPONENT(kitsune::scenegraph::RigidBodyComponent);
 
 	public:
-		RigidBodyComponent(std::shared_ptr<kitsune::scenegraph::Node> Node);
+		enum struct RigidBodyType {
+			Static,
+			Kinematic,
+			Dynamic
+		};
+
+		RigidBodyComponent(float Mass, RigidBodyType Type);
 		virtual ~RigidBodyComponent();
 
 		void setGroup(short Group);
@@ -39,6 +45,15 @@ namespace scenegraph {
 		void setRestitution(float Restitution);
 		float getRestitution() const { return ConstructionInfo.m_restitution; }
 
+		void setLinearVelocity(const btVector3 &velocity) { RigidBody->setLinearVelocity(velocity); }
+		const btVector3& getLinearVelocity() const { return RigidBody->getLinearVelocity(); }
+
+		void setAngularVelocity(const btVector3 &velocity) { RigidBody->setAngularVelocity(velocity); }
+		const btVector3& getAngularVelocity() const { return RigidBody->getAngularVelocity(); }
+
+		void setRigidBodyType(RigidBodyType Type);
+		RigidBodyType getRigidBodyType() const { return Type; }
+
 	private:
 		btRigidBody::btRigidBodyConstructionInfo ConstructionInfo;
 
@@ -50,6 +65,12 @@ namespace scenegraph {
 
 		void readdBodyToWorld();
 		void removeBodyFromWorld();
+
+		void updateRigidBodyPosition();
+
+		void updateNodePosition(float timestep);
+
+		RigidBodyType Type;
 
 	protected:
 		virtual void onNodeSet();

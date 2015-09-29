@@ -17,7 +17,7 @@ namespace SceneGraphTest
 		KIT_SG_COMPONENT(SceneGraphTest::InvalidComponent);
 
 	public:
-		InvalidComponent(std::shared_ptr<sg::Node> Node) : Component(Node) {}
+		InvalidComponent() : Component() {}
 		virtual ~InvalidComponent() {}
 	};
 
@@ -27,7 +27,7 @@ namespace SceneGraphTest
 		KIT_SG_COMPONENT(SceneGraphTest::TestEventComponent);
 
 	public:
-		TestEventComponent(std::shared_ptr<sg::Node> Node) : SceneEventComponent(Node) { updated = 0; }
+		TestEventComponent() : SceneEventComponent() { updated = 0; }
 		virtual ~TestEventComponent() {}
 
 		int updated;
@@ -53,7 +53,7 @@ namespace SceneGraphTest
 
 		TEST_METHOD(ComponentIsActive)
 		{
-			sg::Component *Component = new sg::Component(nullptr);
+			sg::Component *Component = new sg::Component();
 
 			Assert::IsTrue(Component->isLocalActive(), L"Component is not locally active");
 			Assert::IsTrue(Component->isActive(), L"Component is not active");
@@ -92,7 +92,7 @@ namespace SceneGraphTest
 			Scene->initialize();
 
 			auto Node = Scene->getRootNode()->addChildNode();
-			sg::Component *Component = new sg::Component(Node);
+			sg::Component *Component = new sg::Component();
 
 			Node->addComponent(Component);
 
@@ -105,7 +105,7 @@ namespace SceneGraphTest
 			Scene->initialize();
 
 			auto Node = Scene->getRootNode()->addChildNode();
-			sg::Component *Component = new sg::Component(Node);
+			sg::Component *Component = new sg::Component();
 
 			Node->addComponent(Component);
 
@@ -118,7 +118,7 @@ namespace SceneGraphTest
 			Scene->initialize();
 
 			auto Node = Scene->getRootNode()->addChildNode();
-			sg::Component *Component = new sg::Component(Node);
+			sg::Component *Component = new sg::Component();
 
 			Node->addComponent(Component);
 
@@ -127,7 +127,7 @@ namespace SceneGraphTest
 
 		TEST_METHOD(ComponentHasNodeAndScene)
 		{
-			sg::Component *Component = new sg::Component(nullptr);
+			sg::Component *Component = new sg::Component();
 
 			Assert::IsTrue(Component->getScene() == nullptr, L"Component belongs to a scene");
 			Assert::IsTrue(Component->getNode() == nullptr, L"Component belongs to a node");
@@ -150,7 +150,7 @@ namespace SceneGraphTest
 			Scene->initialize();
 
 			auto Node = Scene->getRootNode()->addChildNode();
-			sg::Component *Component = new sg::Component(Node);
+			sg::Component *Component = new sg::Component();
 
 			Node->addComponent(Component);
 
@@ -163,7 +163,7 @@ namespace SceneGraphTest
 			Scene->initialize();
 
 			auto Node = Scene->getRootNode()->addChildNode();
-			std::unique_ptr<sg::Component> Component(new sg::Component(Node));
+			std::unique_ptr<sg::Component> Component(new sg::Component());
 
 			Node->addComponent(Component.get());
 

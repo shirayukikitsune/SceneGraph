@@ -35,5 +35,8 @@
     <ClCompile Include="nodetest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="physicstest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

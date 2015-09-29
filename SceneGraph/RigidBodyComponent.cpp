@@ -2,26 +2,68 @@
 
 #include "PhysicsScene.h"
 
-#include <BulletDynamics/Dynamics/btRigidBody.h>
+#include <BulletCollision/CollisionShapes/btEmptyShape.h>
 
 #include <memory>
 
 using kitsune::scenegraph::RigidBodyComponent;
 namespace sg = kitsune::scenegraph;
 
-RigidBodyComponent::RigidBodyComponent(std::shared_ptr<sg::Node> Node)
-	: Component(Node), Group(0), Mask(0xFFFF), ConstructionInfo(0.0f, nullptr, nullptr)
-{
-	if (Node)
-		ConstructionInfo.m_startWorldTransform = Node->getWorldTransform();
+namespace kitsune {
+namespace scenegraph {
+	class bulletMotionState : public btMotionState
+	{
+	private:
+		std::weak_ptr<Node> Node;
 		
-	RigidBody.reset(new btRigidBody(ConstructionInfo));
+	public:
+		bulletMotionState()
+		{
+
+		}
+
+		virtual ~bulletMotionState()
+		{
+
+		}
+
+		void setNode(std::weak_ptr<kitsune::scenegraph::Node> Node)
+		{
+			this->Node = Node;
+		}
+
+		virtual void getWorldTransform(btTransform & WorldTransform) const
+		{
+			if (auto Ptr = Node.lock()) {
+				WorldTransform = Ptr->getWorldTransform();
+			}
+			else WorldTransform = btTransform::getIdentity();
+		}
+
+		virtual void setWorldTransform(const btTransform & WorldTransform)
+		{
+			if (auto Ptr = Node.lock()) {
+				Ptr->setWorldTransform(WorldTransform);
+			}
+		}
+	};
+}
 }
 
+RigidBodyComponent::RigidBodyComponent(float Mass, RigidBodyType Type)
+	: Group(0), Mask(0xFFFF), ConstructionInfo(Mass, new bulletMotionState, new btEmptyShape), Type(Type)
+{
+	RigidBody.reset(new btRigidBody(ConstructionInfo));
+
+	setRigidBodyType(Type);
+}
 
 RigidBodyComponent::~RigidBodyComponent()
 {
 	removeBodyFromWorld();
+
+	delete ConstructionInfo.m_motionState;
+	delete ConstructionInfo.m_collisionShape;
 }
 
 void RigidBodyComponent::setGroup(short Group)
@@ -77,6 +119,27 @@ void RigidBodyComponent::setRestitution(float Restitution)
 	RigidBody->setRestitution(Restitution);
 }
 
+void RigidBodyComponent::setRigidBodyType(RigidBodyType Type)
+{
+	this->Type = Type;
+
+	auto flags = RigidBody->getCollisionFlags();
+
+	switch (Type) {
+	case RigidBodyType::Static:
+		flags = flags & ~btCollisionObject::CF_KINEMATIC_OBJECT | btCollisionObject::CF_STATIC_OBJECT;
+		break;
+	case RigidBodyType::Kinematic:
+		flags = flags | btCollisionObject::CF_KINEMATIC_OBJECT & ~btCollisionObject::CF_STATIC_OBJECT;
+		break;
+	case RigidBodyType::Dynamic:
+		flags = flags & ~btCollisionObject::CF_KINEMATIC_OBJECT & ~btCollisionObject::CF_STATIC_OBJECT;
+		break;
+	}
+
+	RigidBody->setCollisionFlags(flags);
+}
+
 void RigidBodyComponent::readdBodyToWorld()
 {
 	auto scene = getScene();
@@ -104,6 +167,20 @@ void RigidBodyComponent::removeBodyFromWorld()
 	physicsScene->getWorld()->removeRigidBody(RigidBody.get());
 }
 
+void RigidBodyComponent::updateRigidBodyPosition()
+{
+	auto node = getNode();
+
+	RigidBody->setCenterOfMassTransform(node->getWorldTransform());
+}
+
+void RigidBodyComponent::updateNodePosition(float timeStep)
+{
+	auto node = getNode();
+
+	node->setWorldTransform(RigidBody->getCenterOfMassTransform());
+}
+
 void RigidBodyComponent::onNodeSet()
 {
 	auto scene = getScene();
@@ -114,9 +191,17 @@ void RigidBodyComponent::onNodeSet()
 	if (!physicsScene)
 		return;
 
+	//physicsScene->addUpdateEvent(std::bind(&RigidBodyComponent::updateNodePosition, this, std::placeholders::_1));
+
 	auto node = getNode();
 
+	//node->addInvalidatedByParentEvent(std::bind(&RigidBodyComponent::updateRigidBodyPosition, this));
+
+	static_cast<bulletMotionState*>(RigidBody->getMotionState())->setNode(node);
 	RigidBody->setCenterOfMassTransform(node->getWorldTransform());
 
-	physicsScene->getWorld()->addRigidBody(RigidBody.get(), Group, Mask);
+	// TODO: Get a CollisionShape component and set the rigid body
+
+	if (RigidBody->getBroadphaseHandle() == nullptr)
+		physicsScene->getWorld()->addRigidBody(RigidBody.get(), Group, Mask);
 }

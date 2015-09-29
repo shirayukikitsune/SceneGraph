@@ -33,6 +33,7 @@ void Node::addComponent(std::size_t typehash, sg::Component * Component)
 	if (!Component)
 		return;
 
+	Component->setNode(shared_from_this());
 	std::unique_ptr<sg::Component> NewComponent(Component);
 	Components.emplace(typehash, std::move(NewComponent));
 }
@@ -117,6 +118,16 @@ void Node::resetTransform()
 	invalidate();
 }
 
+Node::invalidatedByParentCallback::auto_remover_type Node::addInvalidatedByParentEvent(invalidatedByParentCallback::function_type && function)
+{
+	return invalidatedByParentEvent.push_auto(function);
+}
+
+Node::invalidatedByParentCallback::auto_remover_type Node::addInvalidatedByParentEvent(const invalidatedByParentCallback::function_type & function)
+{
+	return invalidatedByParentEvent.push_auto(function);
+}
+
 void Node::invalidate()
 {
 	if (RecalculateWorld)
@@ -125,6 +136,7 @@ void Node::invalidate()
 	RecalculateWorld = true;
 
 	for (auto & Child : ChildNodes) {
+		Child->invalidatedByParentEvent();
 		Child->invalidate();
 	}
 }
