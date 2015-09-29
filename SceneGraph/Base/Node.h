@@ -19,6 +19,7 @@ namespace scenegraph {
 	{
 	public:
 		typedef auto_callback<void(void)> invalidatedByParentCallback;
+		typedef auto_callback<void(Component*)> componentChangedCallback;
 
 		Node(std::weak_ptr<Scene> Scene = std::weak_ptr<kitsune::scenegraph::Scene>());
 		~Node();
@@ -30,6 +31,7 @@ namespace scenegraph {
 		void addComponent(std::size_t typehash, Component * Component);
 		bool hasComponent(std::size_t typehash);
 		Component * getComponent(std::size_t typehash);
+		void removeComponent(Component * Component, bool Delete = true);
 
 		template <class T, class... ArgTypes>
 		T * createComponent(ArgTypes... args) {
@@ -78,6 +80,12 @@ namespace scenegraph {
 		invalidatedByParentCallback::auto_remover_type addInvalidatedByParentEvent(invalidatedByParentCallback::function_type && function);
 		invalidatedByParentCallback::auto_remover_type addInvalidatedByParentEvent(const invalidatedByParentCallback::function_type & function);
 
+		componentChangedCallback::auto_remover_type addComponentAddedEvent(componentChangedCallback::function_type && function);
+		componentChangedCallback::auto_remover_type addComponentAddedEvent(const componentChangedCallback::function_type & function);
+
+		componentChangedCallback::auto_remover_type addComponentRemovedEvent(componentChangedCallback::function_type && function);
+		componentChangedCallback::auto_remover_type addComponentRemovedEvent(const componentChangedCallback::function_type & function);
+
 	protected:
 		void invalidate();
 
@@ -96,6 +104,8 @@ namespace scenegraph {
 		bool Active;
 
 		invalidatedByParentCallback invalidatedByParentEvent;
+		componentChangedCallback componentAddedEvent;
+		componentChangedCallback componentRemovedEvent;
 	};
 
 }

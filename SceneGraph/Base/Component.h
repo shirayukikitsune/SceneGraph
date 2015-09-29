@@ -6,7 +6,10 @@
 
 #include <memory>
 
-#define KIT_SG_COMPONENT(t) public: constexpr static std::uint32_t componentNameHash = #t ## _crc32;
+#define KIT_SG_COMPONENT(t) \
+	public: \
+		constexpr static std::uint32_t componentNameHash = #t ## _crc32; \
+		virtual std::uint32_t getComponentNameHash() const { return componentNameHash; }
 
 namespace kitsune {
 namespace scenegraph {
@@ -25,7 +28,7 @@ namespace scenegraph {
 
 		bool isLocalActive() const { return Active; }
 		bool isActive() const;
-		void setActive(bool State) { Active = State; }
+		virtual void setActive(bool State) { Active = State; }
 
 		virtual void initialize();
 

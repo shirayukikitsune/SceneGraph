@@ -36,6 +36,8 @@ void Node::addComponent(std::size_t typehash, sg::Component * Component)
 	Component->setNode(shared_from_this());
 	std::unique_ptr<sg::Component> NewComponent(Component);
 	Components.emplace(typehash, std::move(NewComponent));
+
+	componentAddedEvent(Component);
 }
 
 bool Node::hasComponent(std::size_t typehash)
@@ -51,6 +53,24 @@ sg::Component * Node::getComponent(std::size_t typehash)
 		return nullptr;
 
 	return i->second.get();
+}
+
+void Node::removeComponent(sg::Component * Component, bool Delete)
+{
+	if (!Component)
+		return;
+
+	for (auto & i = Components.begin(); i != Components.end(); ++i) {
+		if (i->second.get() == Component) {
+			if (!Delete)
+				i->second.release();
+
+			Components.erase(i);
+
+			componentRemovedEvent(Component);
+			break;
+		}
+	}
 }
 
 std::shared_ptr<Node> Node::addChildNode()
@@ -126,6 +146,26 @@ Node::invalidatedByParentCallback::auto_remover_type Node::addInvalidatedByParen
 Node::invalidatedByParentCallback::auto_remover_type Node::addInvalidatedByParentEvent(const invalidatedByParentCallback::function_type & function)
 {
 	return invalidatedByParentEvent.push_auto(function);
+}
+
+Node::componentChangedCallback::auto_remover_type Node::addComponentAddedEvent(componentChangedCallback::function_type && function)
+{
+	return componentAddedEvent.push_auto(function);
+}
+
+Node::componentChangedCallback::auto_remover_type Node::addComponentAddedEvent(const componentChangedCallback::function_type & function)
+{
+	return componentAddedEvent.push_auto(function);
+}
+
+Node::componentChangedCallback::auto_remover_type Node::addComponentRemovedEvent(componentChangedCallback::function_type && function)
+{
+	return componentRemovedEvent.push_auto(function);
+}
+
+Node::componentChangedCallback::auto_remover_type Node::addComponentRemovedEvent(const componentChangedCallback::function_type & function)
+{
+	return componentRemovedEvent.push_auto(function);
 }
 
 void Node::invalidate()

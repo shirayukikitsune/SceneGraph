@@ -22,6 +22,8 @@ namespace scenegraph {
 		RigidBodyComponent(float Mass, RigidBodyType Type);
 		virtual ~RigidBodyComponent();
 
+		virtual void setActive(bool State);
+
 		void setGroup(short Group);
 		short getGroup() const { return Group; }
 
@@ -58,6 +60,7 @@ namespace scenegraph {
 		btRigidBody::btRigidBodyConstructionInfo ConstructionInfo;
 
 		std::unique_ptr<btRigidBody> RigidBody;
+		std::unique_ptr<btCollisionShape> DefaultShape;
 
 		short Group;
 		
@@ -66,11 +69,13 @@ namespace scenegraph {
 		void readdBodyToWorld();
 		void removeBodyFromWorld();
 
-		void updateRigidBodyPosition();
-
-		void updateNodePosition(float timestep);
+		void onNodeComponentAdded(Component * Component);
+		void onNodeComponentRemoved(Component * Component);
 
 		RigidBodyType Type;
+
+		Node::componentChangedCallback::auto_remover_type nodeComponentAddedListener;
+		Node::componentChangedCallback::auto_remover_type nodeComponentRemovedListener;
 
 	protected:
 		virtual void onNodeSet();

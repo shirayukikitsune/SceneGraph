@@ -1,5 +1,6 @@
 #include "RigidBodyComponent.h"
 
+#include "CollisionShapeComponent.h"
 #include "../Base/PhysicsScene.h"
 
 #include <BulletCollision/CollisionShapes/btEmptyShape.h>
@@ -51,8 +52,9 @@ namespace scenegraph {
 }
 
 RigidBodyComponent::RigidBodyComponent(float Mass, RigidBodyType Type)
-	: Group(0), Mask(0xFFFF), ConstructionInfo(Mass, new bulletMotionState, new btEmptyShape), Type(Type)
+	: Group(0), Mask(0xFFFF), ConstructionInfo(Mass, new bulletMotionState, nullptr), Type(Type)
 {
+	DefaultShape.reset(new btEmptyShape);
 	RigidBody.reset(new btRigidBody(ConstructionInfo));
 
 	setRigidBodyType(Type);
@@ -63,7 +65,13 @@ RigidBodyComponent::~RigidBodyComponent()
 	removeBodyFromWorld();
 
 	delete ConstructionInfo.m_motionState;
-	delete ConstructionInfo.m_collisionShape;
+}
+
+void RigidBodyComponent::setActive(bool State)
+{
+	Component::setActive(State);
+
+	RigidBody->setActivationState(State == true ? ACTIVE_TAG : DISABLE_SIMULATION);
 }
 
 void RigidBodyComponent::setGroup(short Group)
@@ -167,18 +175,29 @@ void RigidBodyComponent::removeBodyFromWorld()
 	physicsScene->getWorld()->removeRigidBody(RigidBody.get());
 }
 
-void RigidBodyComponent::updateRigidBodyPosition()
+void RigidBodyComponent::onNodeComponentAdded(Component * Component)
 {
-	auto node = getNode();
+	if (Component->getComponentNameHash() != CollisionShapeComponent::componentNameHash)
+		return;
 
-	RigidBody->setCenterOfMassTransform(node->getWorldTransform());
+	auto CollisionShape = static_cast<CollisionShapeComponent*>(Component);
+	RigidBody->setCollisionShape(CollisionShape->getCollisionShape());
+
+	DefaultShape.reset();
+
+	if (CollisionShape->getShape() != CollisionShapeComponent::ShapeFormat::Null)
+		CollisionShape->getCollisionShape()->calculateLocalInertia(ConstructionInfo.m_mass, ConstructionInfo.m_localInertia);
+
+	RigidBody->setMassProps(ConstructionInfo.m_mass, ConstructionInfo.m_localInertia);
 }
 
-void RigidBodyComponent::updateNodePosition(float timeStep)
+void RigidBodyComponent::onNodeComponentRemoved(Component * Component)
 {
-	auto node = getNode();
+	DefaultShape.reset(new btEmptyShape);
+	RigidBody->setCollisionShape(DefaultShape.get());
 
-	node->setWorldTransform(RigidBody->getCenterOfMassTransform());
+	ConstructionInfo.m_localInertia.setZero();
+	RigidBody->setMassProps(ConstructionInfo.m_mass, ConstructionInfo.m_localInertia);
 }
 
 void RigidBodyComponent::onNodeSet()
@@ -191,16 +210,24 @@ void RigidBodyComponent::onNodeSet()
 	if (!physicsScene)
 		return;
 
-	//physicsScene->addUpdateEvent(std::bind(&RigidBodyComponent::updateNodePosition, this, std::placeholders::_1));
-
 	auto node = getNode();
 
-	//node->addInvalidatedByParentEvent(std::bind(&RigidBodyComponent::updateRigidBodyPosition, this));
+	nodeComponentAddedListener = node->addComponentAddedEvent(std::bind(&RigidBodyComponent::onNodeComponentAdded, this, std::placeholders::_1));
+	nodeComponentRemovedListener = node->addComponentRemovedEvent(std::bind(&RigidBodyComponent::onNodeComponentRemoved, this, std::placeholders::_1));
 
 	static_cast<bulletMotionState*>(RigidBody->getMotionState())->setNode(node);
 	RigidBody->setCenterOfMassTransform(node->getWorldTransform());
 
-	// TODO: Get a CollisionShape component and set the rigid body
+	auto CollisionShape = node->getComponent<CollisionShapeComponent>();
+	if (CollisionShape != nullptr) {
+		RigidBody->setCollisionShape(CollisionShape->getCollisionShape());
+		DefaultShape.reset();
+
+		if (CollisionShape->getShape() != CollisionShapeComponent::ShapeFormat::Null)
+			CollisionShape->getCollisionShape()->calculateLocalInertia(ConstructionInfo.m_mass, ConstructionInfo.m_localInertia);
+
+		RigidBody->setMassProps(ConstructionInfo.m_mass, ConstructionInfo.m_localInertia);
+	}
 
 	if (RigidBody->getBroadphaseHandle() == nullptr)
 		physicsScene->getWorld()->addRigidBody(RigidBody.get(), Group, Mask);
