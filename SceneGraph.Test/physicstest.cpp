@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 
-#include "../SceneGraph/Node.h"
-#include "../SceneGraph/PhysicsScene.h"
-#include "../SceneGraph/RigidBodyComponent.h"
+#include "../SceneGraph/Base/Node.h"
+#include "../SceneGraph/Base/PhysicsScene.h"
+#include "../SceneGraph/Components/RigidBodyComponent.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace sg = kitsune::scenegraph;

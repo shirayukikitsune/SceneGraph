@@ -146,22 +146,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Callback.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="Hash.h" />
-    <ClInclude Include="Node.h" />
-    <ClInclude Include="PhysicsScene.h" />
-    <ClInclude Include="RigidBodyComponent.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="SceneEventComponent.h" />
+    <ClInclude Include="Base\Callback.h" />
+    <ClInclude Include="Components\CollisionShapeComponent.h" />
+    <ClInclude Include="Base\Component.h" />
+    <ClInclude Include="Base\Hash.h" />
+    <ClInclude Include="Base\Node.h" />
+    <ClInclude Include="Base\PhysicsScene.h" />
+    <ClInclude Include="Components\RigidBodyComponent.h" />
+    <ClInclude Include="Base\Scene.h" />
+    <ClInclude Include="Components\SceneEventComponent.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="Node.cpp" />
-    <ClCompile Include="PhysicsScene.cpp" />
-    <ClCompile Include="RigidBodyComponent.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="SceneEventComponent.cpp" />
+    <ClCompile Include="Components\CollisionShapeComponent.cpp" />
+    <ClCompile Include="Base\Component.cpp" />
+    <ClCompile Include="Base\Node.cpp" />
+    <ClCompile Include="Base\PhysicsScene.cpp" />
+    <ClCompile Include="Components\RigidBodyComponent.cpp" />
+    <ClCompile Include="Base\Scene.cpp" />
+    <ClCompile Include="Components\SceneEventComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\xbeat\Third Party\bullet3\build3\vs2010\BulletCollision.vcxproj">

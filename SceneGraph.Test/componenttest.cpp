@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 
-#include "../SceneGraph/Component.h"
-#include "../SceneGraph/Node.h"
-#include "../SceneGraph/SceneEventComponent.h"
+#include "../SceneGraph/Base/Component.h"
+#include "../SceneGraph/Base/Node.h"
+#include "../SceneGraph/Components/SceneEventComponent.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace sg = kitsune::scenegraph;

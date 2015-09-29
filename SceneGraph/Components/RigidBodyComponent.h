@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "../Base/Component.h"
 
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 

@@ -1,6 +1,6 @@
 #include "RigidBodyComponent.h"
 
-#include "PhysicsScene.h"
+#include "../Base/PhysicsScene.h"
 
 #include <BulletCollision/CollisionShapes/btEmptyShape.h>
 

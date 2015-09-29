@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Component.h"
-#include "Scene.h"
+#include "../Base/Component.h"
+#include "../Base/Scene.h"
 
 namespace kitsune {
 namespace scenegraph {

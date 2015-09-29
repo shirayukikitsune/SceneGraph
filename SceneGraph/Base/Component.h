@@ -6,8 +6,7 @@
 
 #include <memory>
 
-#define KIT_SG_COMPONENT_NAME(t) #t
-#define KIT_SG_COMPONENT(t) public: constexpr static std::size_t componentNameHash = KIT_SG_COMPONENT_NAME(t)_hash;
+#define KIT_SG_COMPONENT(t) public: constexpr static std::uint32_t componentNameHash = #t ## _crc32;
 
 namespace kitsune {
 namespace scenegraph {

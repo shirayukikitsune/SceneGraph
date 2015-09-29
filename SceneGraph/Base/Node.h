@@ -42,7 +42,7 @@ namespace scenegraph {
 		}
 		template <class T>
 		void addComponent(T * Component) {
-			addComponent(T::componentNameHash, Component);
+			addComponent(T::componentNameHash, std::forward<T*>(Component));
 		}
 		template <class T>
 		bool hasComponent() {
