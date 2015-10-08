@@ -7,6 +7,8 @@
 namespace kitsune {
 namespace scenegraph {
 
+	class ConstraintComponent;
+
 	class RigidBodyComponent :
 		public Component
 	{
@@ -76,6 +78,8 @@ namespace scenegraph {
 
 		Node::componentChangedCallback::auto_remover_type nodeComponentAddedListener;
 		Node::componentChangedCallback::auto_remover_type nodeComponentRemovedListener;
+
+		friend class ConstraintComponent;
 
 	protected:
 		virtual void onNodeSet();

@@ -209,14 +209,14 @@ namespace scenegraph {
 		int m_id;
 		std::map<int, function_type> m_functions;
 	};
-	
+
 	template<class R, typename... ArgTypes>
 	class auto_callback<R(ArgTypes...)>
 		: public callback<R(ArgTypes...)>
 	{
 	public:
 		typedef class auto_callback<R(ArgTypes...)> _Myt;
-		typedef class std::unique_ptr<helper::auto_remover<_Myt>> auto_remover_type;
+		typedef class std::shared_ptr<helper::auto_remover<_Myt>> auto_remover_type;
 
 		auto_remover_type push_auto(const function_type &fn) {
 			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
@@ -233,13 +233,13 @@ namespace scenegraph {
 	{
 	public:
 		typedef class auto_callback<void(ArgTypes...)> _Myt;
-		typedef class std::unique_ptr<helper::auto_remover<_Myt>> auto_remover_type;
+		typedef class std::shared_ptr<helper::auto_remover<_Myt>> auto_remover_type;
 
 		auto_remover_type push_auto(const function_type &fn) {
 			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 
-		std::shared_ptr<auto_remover_type> push_auto(function_type && fn) {
+		auto_remover_type push_auto(function_type && fn) {
 			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 	};

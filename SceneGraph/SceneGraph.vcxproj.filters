@@ -54,6 +54,12 @@
     <ClInclude Include="Base\Scene.h">
       <Filter>Header Files\Base</Filter>
     </ClInclude>
+    <ClInclude Include="Components\ConstraintComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\MultiPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Components\RigidBodyComponent.cpp">
@@ -76,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="Base\Scene.cpp">
       <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\ConstraintComponent.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
