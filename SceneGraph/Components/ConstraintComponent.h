@@ -51,10 +51,10 @@ namespace scenegraph {
 		void setUpperLinearLimit(const btVector3 & UpperLinearLimit) { setConstraintLimits(); this->UpperLinearLimit = UpperLinearLimit; }
 		const btVector3& getUpperLinearLimit() const { return this->UpperLinearLimit; }
 
-		void setSpringConstant(int DoF, float SpringConstant) { setConstraintLimits(); this->SpringConstants[DoF] = SpringConstant; }
+		void setSpringConstant(int DoF, float SpringConstant);
 		float getSpringConstant(int DoF) const { return this->SpringConstants[DoF]; }
 
-		void setSpringActivation(int DoF, bool SpringActivation) { setConstraintLimits(); this->SpringActivation[DoF] = SpringActivation; }
+		void setSpringActivation(int DoF, bool SpringActivation);
 		bool getSpringActivation(int DoF) const { return this->SpringActivation[DoF]; }
 
 	private:

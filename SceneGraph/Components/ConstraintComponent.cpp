@@ -10,6 +10,8 @@
 #include <BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
 #include <BulletDynamics/ConstraintSolver/btSliderConstraint.h>
 
+#include <cassert>
+
 using kitsune::scenegraph::ConstraintComponent;
 
 ConstraintComponent::ConstraintComponent()
@@ -39,16 +41,31 @@ void ConstraintComponent::setAssociatedNode(std::weak_ptr<kitsune::scenegraph::N
 	createConstraint();
 }
 
+void ConstraintComponent::setSpringActivation(int DoF, bool SpringActivation)
+{
+	setConstraintLimits();
+
+	assert("Invalid DoF" && DoF >= 0 && DoF <= 5);
+
+	this->SpringActivation[DoF] = SpringActivation;
+}
+
+void ConstraintComponent::setSpringConstant(int DoF, float SpringConstant)
+{
+	setConstraintLimits();
+	
+	assert("Invalid DoF" && DoF >= 0 && DoF <= 5);
+
+	this->SpringConstants[DoF] = SpringConstant;
+}
+
 void ConstraintComponent::createConstraint()
 {
 	auto node = getNode();
 	auto associated = AssociatedNode.lock();
 
-	if (!associated || !node)
-		return;
-
-	if (!associated->hasComponent<RigidBodyComponent>() || !node->hasComponent<RigidBodyComponent>())
-		return;
+	assert("Constraint not associated" && (!associated || !node));
+	assert("Constraint associated nodes with no rigid body" && (!associated->hasComponent<RigidBodyComponent>() || !node->hasComponent<RigidBodyComponent>()));
 
 	btTransform frameFromB = getOffsetFromNode().inverseTimes(associated->getLocalTransform());
 

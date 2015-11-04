@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencie
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SceneGraph.DX12", "SceneGraph.DX12\SceneGraph.DX12.vcxproj", "{E8ED79D2-7B7C-4CE0-9767-D45B157C2495}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SceneGraph.DX12.Example", "SceneGraph.DX12.Example\SceneGraph.DX12.Example.vcxproj", "{2C74A359-4551-4594-B0A6-CCD545CD6411}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -83,6 +85,14 @@ Global
 		{E8ED79D2-7B7C-4CE0-9767-D45B157C2495}.Release|x64.Build.0 = Release|x64
 		{E8ED79D2-7B7C-4CE0-9767-D45B157C2495}.Release|x86.ActiveCfg = Release|Win32
 		{E8ED79D2-7B7C-4CE0-9767-D45B157C2495}.Release|x86.Build.0 = Release|Win32
+		{2C74A359-4551-4594-B0A6-CCD545CD6411}.Debug|x64.ActiveCfg = Debug|x64
+		{2C74A359-4551-4594-B0A6-CCD545CD6411}.Debug|x64.Build.0 = Debug|x64
+		{2C74A359-4551-4594-B0A6-CCD545CD6411}.Debug|x86.ActiveCfg = Debug|Win32
+		{2C74A359-4551-4594-B0A6-CCD545CD6411}.Debug|x86.Build.0 = Debug|Win32
+		{2C74A359-4551-4594-B0A6-CCD545CD6411}.Release|x64.ActiveCfg = Release|x64
+		{2C74A359-4551-4594-B0A6-CCD545CD6411}.Release|x64.Build.0 = Release|x64
+		{2C74A359-4551-4594-B0A6-CCD545CD6411}.Release|x86.ActiveCfg = Release|Win32
+		{2C74A359-4551-4594-B0A6-CCD545CD6411}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
