@@ -6,7 +6,7 @@ using kitsune::scenegraph::Node;
 namespace sg = kitsune::scenegraph;
 
 Node::Node(std::weak_ptr<sg::Scene> Scene)
-	: Scene(Scene)
+    : ParentScene(Scene)
 {
 	LocalTransform.setIdentity();
 	Active = true;
@@ -35,7 +35,7 @@ void Node::addComponent(std::size_t typehash, sg::Component * Component)
 
 	Component->setNode(shared_from_this());
 	std::unique_ptr<sg::Component> NewComponent(Component);
-	Components.emplace(typehash, std::move(NewComponent));
+    Components.emplace(typehash, std::move(NewComponent));
 
 	componentAddedEvent(Component);
 }
@@ -47,7 +47,7 @@ bool Node::hasComponent(std::size_t typehash)
 
 sg::Component * Node::getComponent(std::size_t typehash)
 {
-	auto &i = Components.find(typehash);
+    auto i = Components.find(typehash);
 
 	if (i == Components.end())
 		return nullptr;
@@ -60,7 +60,7 @@ void Node::removeComponent(sg::Component * Component, bool Delete)
 	if (!Component)
 		return;
 
-	for (auto & i = Components.begin(); i != Components.end(); ++i) {
+    for (auto i = Components.begin(); i != Components.end(); ++i) {
 		if (i->second.get() == Component) {
 			if (!Delete)
 				i->second.release();
@@ -75,15 +75,15 @@ void Node::removeComponent(sg::Component * Component, bool Delete)
 
 std::shared_ptr<Node> Node::addChildNode()
 {
-	std::shared_ptr<Node> Node(new Node(this->Scene));
+    std::shared_ptr<Node> CurrentNode(new Node(this->ParentScene));
 
-	Node->ParentNode = shared_from_this();
+    CurrentNode->ParentNode = shared_from_this();
 
-	ChildNodes.emplace(Node);
+    ChildNodes.emplace(CurrentNode);
 
 	invalidate();
 
-	return Node;
+    return CurrentNode;
 }
 
 std::shared_ptr<Node> Node::getParentNode()
@@ -96,7 +96,7 @@ std::shared_ptr<Node> Node::getParentNode()
 
 std::shared_ptr<sg::Scene> Node::getScene()
 {
-	if (auto Scene = this->Scene.lock())
+    if (auto Scene = this->ParentScene.lock())
 		return Scene;
 
 	return std::shared_ptr<kitsune::scenegraph::Scene>();

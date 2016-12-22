@@ -41,9 +41,9 @@ namespace scenegraph {
 		onNodeSetCallback::auto_remover_type addOnNodeSetEvent(const onNodeSetCallback::function_type & function);
 
 	private:
-		std::weak_ptr<Node> Node;
+        std::weak_ptr<Node> ParentNode;
 		
-		std::weak_ptr<Scene> Scene;
+        std::weak_ptr<Scene> ParentScene;
 
 		bool Active;
 

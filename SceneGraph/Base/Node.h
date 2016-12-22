@@ -95,7 +95,7 @@ namespace scenegraph {
 		bool RecalculateWorld;
 
 		std::weak_ptr<Node> ParentNode;
-		std::weak_ptr<Scene> Scene;
+        std::weak_ptr<Scene> ParentScene;
 
 		std::set<std::shared_ptr<Node>> ChildNodes;
 

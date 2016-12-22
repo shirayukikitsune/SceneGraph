@@ -15,7 +15,7 @@ namespace scenegraph {
 	class bulletMotionState : public btMotionState
 	{
 	private:
-		std::weak_ptr<Node> Node;
+        std::weak_ptr<Node> ParentNode;
 		
 	public:
 		bulletMotionState()
@@ -30,12 +30,12 @@ namespace scenegraph {
 
 		void setNode(std::weak_ptr<kitsune::scenegraph::Node> Node)
 		{
-			this->Node = Node;
+            this->ParentNode = Node;
 		}
 
 		virtual void getWorldTransform(btTransform & WorldTransform) const
 		{
-			if (auto Ptr = Node.lock()) {
+            if (auto Ptr = ParentNode.lock()) {
 				WorldTransform = Ptr->getWorldTransform();
 			}
 			else WorldTransform = btTransform::getIdentity();
@@ -43,7 +43,7 @@ namespace scenegraph {
 
 		virtual void setWorldTransform(const btTransform & WorldTransform)
 		{
-			if (auto Ptr = Node.lock()) {
+            if (auto Ptr = ParentNode.lock()) {
 				Ptr->setWorldTransform(WorldTransform);
 			}
 		}

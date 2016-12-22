@@ -17,7 +17,7 @@ bool Component::isActive() const
 	if (!isLocalActive())
 		return false;
 
-	if (auto HasNode = Node.lock()) {
+    if (auto HasNode = ParentNode.lock()) {
 		return HasNode->isActive();
 	}
 
@@ -30,12 +30,12 @@ void Component::initialize()
 
 void Component::setNode(std::weak_ptr<sg::Node> Node)
 {
-	this->Node = Node;
+    this->ParentNode = Node;
 
 	if (auto NodePtr = Node.lock())
-		this->Scene = NodePtr->getScene();
+        this->ParentScene = NodePtr->getScene();
 	else
-		this->Scene.reset();
+        this->ParentScene.reset();
 
 	onNodeSet();
 	onNodeSetEvent(Node);
@@ -43,7 +43,7 @@ void Component::setNode(std::weak_ptr<sg::Node> Node)
 
 std::shared_ptr<sg::Node> Component::getNode()
 {
-	if (auto Node = this->Node.lock())
+    if (auto Node = this->ParentNode.lock())
 		return Node;
 
 	return std::shared_ptr<sg::Node>();
@@ -51,7 +51,7 @@ std::shared_ptr<sg::Node> Component::getNode()
 
 std::shared_ptr<sg::Scene> Component::getScene()
 {
-	if (auto Scene = this->Scene.lock())
+    if (auto Scene = this->ParentScene.lock())
 		return Scene;
 
 	return std::shared_ptr<sg::Scene>();

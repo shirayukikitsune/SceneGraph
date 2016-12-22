@@ -218,11 +218,11 @@ namespace scenegraph {
 		typedef class auto_callback<R(ArgTypes...)> _Myt;
 		typedef class std::shared_ptr<helper::auto_remover<_Myt>> auto_remover_type;
 
-		auto_remover_type push_auto(const function_type &fn) {
+                auto_remover_type push_auto(const typename callback<R(ArgTypes...)>::function_type &fn) {
 			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 
-		auto_remover_type push_auto(function_type && fn) {
+                auto_remover_type push_auto(typename callback<R(ArgTypes...)>::function_type && fn) {
 			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 	};
@@ -235,11 +235,11 @@ namespace scenegraph {
 		typedef class auto_callback<void(ArgTypes...)> _Myt;
 		typedef class std::shared_ptr<helper::auto_remover<_Myt>> auto_remover_type;
 
-		auto_remover_type push_auto(const function_type &fn) {
+                auto_remover_type push_auto(const typename callback<void(ArgTypes...)>::function_type &fn) {
 			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 
-		auto_remover_type push_auto(function_type && fn) {
+                auto_remover_type push_auto(typename callback<void(ArgTypes...)>::function_type && fn) {
 			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
 		}
 	};

@@ -1,4 +1,4 @@
-add_library(SceneGraph
+add_library(scenegraph
     Base/Component.cpp
     Base/Node.cpp
     Base/PhysicsScene.cpp
@@ -9,4 +9,4 @@ add_library(SceneGraph
     Components/SceneEventComponent.cpp
     )
 
-target_include_directories (SceneGraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(scenegraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
