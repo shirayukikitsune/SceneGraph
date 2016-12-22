@@ -183,6 +183,9 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 
+# Visual Studio Code
+.vscode
+
 # =========================
 # Operating System Files
 # =========================
