@@ -28,6 +28,8 @@ namespace scenegraph {
 			~auto_remover() {
 				callback->pop(functionId);
 			}
+
+            int getFunctionId() const { return functionId; }
 		};
 	}
 
@@ -216,16 +218,26 @@ namespace scenegraph {
 	{
 	public:
 		typedef class auto_callback<R(ArgTypes...)> _Myt;
-		typedef class std::shared_ptr<helper::auto_remover<_Myt>> auto_remover_type;
+        typedef class helper::auto_remover<_Myt> _Helper;
+        typedef class std::weak_ptr<_Helper> auto_remover_type;
 
-                auto_remover_type push_auto(const typename callback<R(ArgTypes...)>::function_type &fn) {
-			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
-		}
+        auto_remover_type push_auto(const typename callback<R(ArgTypes...)>::function_type &fn) {
+            int functionId = this->push(fn);
+            auto helper = std::make_shared<_Helper>(functionId, this);
+            m_registeredCallbacks[functionId] = helper;
+            return auto_remover_type(helper);
+        }
 
-                auto_remover_type push_auto(typename callback<R(ArgTypes...)>::function_type && fn) {
-			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
-		}
-	};
+        auto_remover_type push_auto(typename callback<R(ArgTypes...)>::function_type && fn) {
+            int functionId = this->push(fn);
+            auto helper = std::make_shared<_Helper>(functionId, this);
+            m_registeredCallbacks[functionId] = helper;
+            return auto_remover_type(helper);
+        }
+
+    private:
+        std::map<int, std::shared_ptr<_Helper>> m_registeredCallbacks;
+    };
 
 	template<class... ArgTypes>
 	class auto_callback<void(ArgTypes...)>
@@ -233,15 +245,25 @@ namespace scenegraph {
 	{
 	public:
 		typedef class auto_callback<void(ArgTypes...)> _Myt;
-		typedef class std::shared_ptr<helper::auto_remover<_Myt>> auto_remover_type;
+        typedef class helper::auto_remover<_Myt> _Helper;
+		typedef class std::weak_ptr<_Helper> auto_remover_type;
 
-                auto_remover_type push_auto(const typename callback<void(ArgTypes...)>::function_type &fn) {
-			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
+        auto_remover_type push_auto(const typename callback<void(ArgTypes...)>::function_type &fn) {
+            int functionId = this->push(fn);
+            auto helper = std::make_shared<_Helper>(functionId, this);
+            m_registeredCallbacks[functionId] = helper;
+            return auto_remover_type(helper);
+        }
+
+        auto_remover_type push_auto(typename callback<void(ArgTypes...)>::function_type && fn) {
+            int functionId = this->push(fn);
+            auto helper = std::make_shared<_Helper>(functionId, this);
+            m_registeredCallbacks[functionId] = helper;
+            return auto_remover_type(helper);
 		}
 
-                auto_remover_type push_auto(typename callback<void(ArgTypes...)>::function_type && fn) {
-			return auto_remover_type(new helper::auto_remover<_Myt>(this->push(fn), this));
-		}
+    private:
+        std::map<int, std::shared_ptr<_Helper>> m_registeredCallbacks;
 	};
 }
 }

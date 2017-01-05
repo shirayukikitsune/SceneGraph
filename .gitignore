@@ -232,3 +232,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/SceneGraph.VC.VC.opendb
+/SceneGraph.VC.db
