@@ -55,10 +55,10 @@
       <Filter>Header Files\Base</Filter>
     </ClInclude>
     <ClInclude Include="Components\ConstraintComponent.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="Base\MultiPtr.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -84,7 +84,7 @@
       <Filter>Source Files\Base</Filter>
     </ClCompile>
     <ClCompile Include="Components\ConstraintComponent.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

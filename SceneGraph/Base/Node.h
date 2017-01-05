@@ -36,9 +36,10 @@ namespace scenegraph {
 		template <class T, class... ArgTypes>
 		T * createComponent(ArgTypes... args) {
 			T * ptr = new T(args...);
-			ptr->setNode(shared_from_this());
 
 			addComponent<T>(ptr);
+
+            ptr->initialize();
 
 			return ptr;
 		}

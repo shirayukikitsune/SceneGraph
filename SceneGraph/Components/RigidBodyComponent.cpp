@@ -52,7 +52,7 @@ namespace scenegraph {
 }
 
 RigidBodyComponent::RigidBodyComponent(float Mass, RigidBodyType Type)
-	: Group(1), Mask(0xFFFF), ConstructionInfo(Mass, new bulletMotionState, nullptr), Type(Type)
+	: Group(1), Mask(-1), ConstructionInfo(Mass, new bulletMotionState, nullptr), Type(Type)
 {
 	DefaultShape.reset(new btEmptyShape);
 	RigidBody.reset(new btRigidBody(ConstructionInfo));
@@ -63,6 +63,7 @@ RigidBodyComponent::RigidBodyComponent(float Mass, RigidBodyType Type)
 RigidBodyComponent::~RigidBodyComponent()
 {
 	removeBodyFromWorld();
+    setNode(std::weak_ptr<Node>());
 
 	delete ConstructionInfo.m_motionState;
 }
@@ -202,6 +203,10 @@ void RigidBodyComponent::onNodeComponentRemoved(Component * Component)
 
 void RigidBodyComponent::onNodeSet()
 {
+    // Ensure that events are reset
+    nodeComponentAddedListener.reset();
+    nodeComponentRemovedListener.reset();
+
 	auto scene = getScene();
 	if (!scene)
 		return;

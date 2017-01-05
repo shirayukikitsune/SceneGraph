@@ -32,7 +32,10 @@ namespace SceneGraphTest
 
 			auto Node = Scene->getRootNode()->addChildNode();
 			Node->setWorldTransform(btTransform::getIdentity());
-			auto RigidBody = Node->createComponent<sg::RigidBodyComponent>(1.0f, sg::RigidBodyComponent::RigidBodyType::Dynamic);
+            auto CollisionShape = Node->createComponent<sg::CollisionShapeComponent>();
+            CollisionShape->setDimentions(btVector3(1, 1, 1));
+            CollisionShape->setShape(sg::CollisionShapeComponent::ShapeFormat::Box);
+            auto RigidBody = Node->createComponent<sg::RigidBodyComponent>(1.0f, sg::RigidBodyComponent::RigidBodyType::Dynamic);
 
 			for (int i = 0; i < 60; ++i)
 				Scene->update(1.0f / 60.0f);

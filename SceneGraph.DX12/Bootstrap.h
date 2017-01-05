@@ -24,7 +24,7 @@ namespace dx12 {
 		virtual void createAdapter();
 
 	protected:
-		ComPtr<ID3D12Device> Device;
+		Microsoft::WRL::ComPtr<ID3D12Device> Device;
 
 		std::vector<IDXGIAdapter1*> && findAvailableDevices(IDXGIFactory4 *Factory);
 	};
