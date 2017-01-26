@@ -1,12 +1,52 @@
+set(HEADER_FILES 
+        Base/Callback.h
+        Base/Component.h
+        Base/Hash.h
+        Base/MultiPtr.h
+        Base/Node.h
+        Base/PhysicsScene.h
+        Base/Scene.h
+        Components/CollisionShapeComponent.h
+        Components/ConstraintComponent.h
+        Components/RigidBodyComponent.h
+        Components/SceneEventComponent.h
+    )
+
 add_library(scenegraph
-    Base/Component.cpp
-    Base/Node.cpp
-    Base/PhysicsScene.cpp
-    Base/Scene.cpp
-    Components/CollisionShapeComponent.cpp
-    Components/ConstraintComponent.cpp
-    Components/RigidBodyComponent.cpp
-    Components/SceneEventComponent.cpp
+        Base/Component.cpp
+        Base/Node.cpp
+        Base/PhysicsScene.cpp
+        Base/Scene.cpp
+        Components/CollisionShapeComponent.cpp
+        Components/ConstraintComponent.cpp
+        Components/RigidBodyComponent.cpp
+        Components/SceneEventComponent.cpp
     )
 
 target_include_directories(scenegraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+set_target_properties( 
+  scenegraph
+PROPERTIES 
+  FRAMEWORK ON
+  SOVERSION 0
+  VERSION 0.1
+  ARCHIVE_OUTPUT_DIRECTORY "lib"
+  LIBRARY_OUTPUT_DIRECTORY "lib"
+  OUTPUT_NAME kitsune-scenegraph
+)   
+
+install(TARGETS scenegraph
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib)
+
+MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST)
+
+    FOREACH(HEADER ${${HEADER_LIST}})
+        STRING(REGEX MATCH "(.*)[/\\]" DIR ${HEADER})
+        INSTALL(FILES ${HEADER} DESTINATION include/kitsune/scenegraph/${DIR})
+    ENDFOREACH(HEADER)
+
+ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
+
+INSTALL_HEADERS_WITH_DIRECTORY(HEADER_FILES)
