@@ -28,6 +28,7 @@ namespace scenegraph {
 		bool isActive() const;
 		void setActive(bool State) { Active = State; }
 
+		void addComponent(std::size_t typehash, std::unique_ptr<Component> && Component);
 		void addComponent(std::size_t typehash, Component * Component);
 		bool hasComponent(std::size_t typehash);
 		Component * getComponent(std::size_t typehash);
@@ -42,6 +43,10 @@ namespace scenegraph {
             ptr->initialize();
 
 			return ptr;
+		}
+		template <class T>
+		void addComponent(std::unique_ptr<T> && Component) {
+			addComponent(T::componentNameHash, std::move(Component));
 		}
 		template <class T>
 		void addComponent(T * Component) {

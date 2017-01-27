@@ -1,200 +1,170 @@
-#include "stdafx.h"
-#include "CppUnitTest.h"
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE kitsune::scenegraph::Component
+#include <boost/test/unit_test.hpp>
 
-#include "../SceneGraph/Base/Component.h"
-#include "../SceneGraph/Base/Node.h"
-#include "../SceneGraph/Components/SceneEventComponent.h"
+#include "Base/Component.h"
+#include "Base/Node.h"
+#include "Components/SceneEventComponent.h"
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace sg = kitsune::scenegraph;
 
-namespace SceneGraphTest
-{		
+class InvalidComponent
+	: public sg::Component
+{
+	KIT_SG_COMPONENT(SceneGraphTest::InvalidComponent);
 
-	class InvalidComponent
-		: public sg::Component
-	{
-		KIT_SG_COMPONENT(SceneGraphTest::InvalidComponent);
+public:
+	InvalidComponent() : Component() {}
+	virtual ~InvalidComponent() {}
+};
 
-	public:
-		InvalidComponent() : Component() {}
-		virtual ~InvalidComponent() {}
-	};
+class TestEventComponent
+	: public sg::SceneEventComponent
+{
+	KIT_SG_COMPONENT(SceneGraphTest::TestEventComponent);
 
-	class TestEventComponent
-		: public sg::SceneEventComponent
-	{
-		KIT_SG_COMPONENT(SceneGraphTest::TestEventComponent);
+public:
+	TestEventComponent() : SceneEventComponent() { updated = 0; }
+	virtual ~TestEventComponent() {}
 
-	public:
-		TestEventComponent() : SceneEventComponent() { updated = 0; }
-		virtual ~TestEventComponent() {}
+	int updated;
 
-		int updated;
+	virtual void onPreUpdate(float DeltaTime) {
+		updated = 1;
 
-		virtual void onPreUpdate(float DeltaTime) {
-			updated = 1;
+		sg::SceneEventComponent::onPreUpdate(DeltaTime);
+	}
 
-			sg::SceneEventComponent::onPreUpdate(DeltaTime);
-		}
+	virtual void onUpdate(float DeltaTime) {
+		updated = 2;
 
-		virtual void onUpdate(float DeltaTime) {
-			updated = 2;
+		sg::SceneEventComponent::onUpdate(DeltaTime);
+	}
 
-			sg::SceneEventComponent::onUpdate(DeltaTime);
-		}
+	virtual uint32_t getAttachedEvents() { return (uint32_t)AttachedEvents::PreUpdate | (uint32_t)AttachedEvents::Update; }
+};
 
-		virtual uint32_t getAttachedEvents() { return (uint32_t)AttachedEvents::PreUpdate | (uint32_t)AttachedEvents::Update; }
-	};
+BOOST_AUTO_TEST_SUITE(Component)
 
-	TEST_CLASS(ComponentTest)
-	{
-	public:
+BOOST_AUTO_TEST_CASE(ComponentIsActive)
+{
+	sg::Component *Component = new sg::Component();
 
-		TEST_METHOD(ComponentIsActive)
-		{
-			sg::Component *Component = new sg::Component();
+	BOOST_TEST(Component->isLocalActive(), "Component is not locally active");
+	BOOST_TEST(Component->isActive(), "Component is not active");
 
-			Assert::IsTrue(Component->isLocalActive(), L"Component is not locally active");
-			Assert::IsTrue(Component->isActive(), L"Component is not active");
+	Component->setActive(false);
 
-			Component->setActive(false);
-
-			Assert::IsFalse(Component->isLocalActive(), L"Component is locally active");
-			Assert::IsFalse(Component->isActive(), L"Component is active");
-		}
-
-		TEST_METHOD(NodeComponentIsActive)
-		{
-			std::shared_ptr<sg::Node> Node(new sg::Node());
-			auto Component = Node->createComponent<sg::Component>();
-
-			Assert::IsNotNull(Component, L"Failed to create component");
-
-			Assert::IsTrue(Node->isActive(), L"Node is not active");
-			Assert::IsTrue(Component->isActive(), L"Component is not active");
-
-			Node->setActive(false);
-
-			Assert::IsFalse(Component->isActive(), L"Component is active");
-			Assert::IsTrue(Component->isLocalActive(), L"Component is not locally active");
-
-			Node->setActive(true);
-			Component->setActive(false);
-
-			Assert::IsFalse(Component->isActive(), L"Component is active");
-			Assert::IsFalse(Component->isLocalActive(), L"Component is locally active");
-		}
-		
-		TEST_METHOD(NodeHasComponent)
-		{
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-
-			auto Node = Scene->getRootNode()->addChildNode();
-			sg::Component *Component = new sg::Component();
-
-			Node->addComponent(Component);
-
-			Assert::IsTrue(Node->hasComponent<sg::Component>(), L"Component not found");
-		}
-
-		TEST_METHOD(NodeDoesNotHaveComponent)
-		{
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-
-			auto Node = Scene->getRootNode()->addChildNode();
-			sg::Component *Component = new sg::Component();
-
-			Node->addComponent(Component);
-
-			Assert::IsFalse(Node->hasComponent<InvalidComponent>(), L"Component found");
-		}
-
-		TEST_METHOD(NodeGetComponent)
-		{
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-
-			auto Node = Scene->getRootNode()->addChildNode();
-			sg::Component *Component = new sg::Component();
-
-			Node->addComponent(Component);
-
-			Assert::IsNotNull(Node->getComponent<sg::Component>(), L"Component not found");
-		}
-
-		TEST_METHOD(ComponentHasNodeAndScene)
-		{
-			sg::Component *Component = new sg::Component();
-
-			Assert::IsTrue(Component->getScene() == nullptr, L"Component belongs to a scene");
-			Assert::IsTrue(Component->getNode() == nullptr, L"Component belongs to a node");
-
-			delete Component;
-
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-
-			auto Node = Scene->getRootNode();
-			Component = Node->createComponent<sg::Component>();
-
-			Assert::IsFalse(Component->getScene() == nullptr, L"Component doesn't belongs to a scene");
-			Assert::IsFalse(Component->getNode() == nullptr, L"Component doesn't belongs to a node");
-		}
-
-		TEST_METHOD(NodeGetInvalidComponent)
-		{
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-
-			auto Node = Scene->getRootNode()->addChildNode();
-			sg::Component *Component = new sg::Component();
-
-			Node->addComponent(Component);
-
-			Assert::IsNull(Node->getComponent<InvalidComponent>(), L"Component found");
-		}
-
-		TEST_METHOD(NodeDeleteComponent)
-		{
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-
-			auto Node = Scene->getRootNode()->addChildNode();
-			std::unique_ptr<sg::Component> Component(new sg::Component());
-
-			Node->addComponent(Component.get());
-
-			Node.reset();
-			Scene.reset();
-
-			bool fail = false;
-			try {
-				Component.reset(); // This should throw an access violation
-				fail = true;
-			}
-			catch (...) {
-			}
-
-			Assert::IsFalse(fail, L"Component not deleted");
-		}
-
-		TEST_METHOD(SceneEventComponent)
-		{
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-
-			auto Node = Scene->getRootNode()->addChildNode();
-			auto Component = Node->createComponent<TestEventComponent>();
-
-			Component->registerEvents();
-
-			Scene->update(100.0f);
-
-			Assert::IsTrue(Component->updated == 2, L"Update events not called");
-		}
-
-	};
+	BOOST_TEST(!Component->isLocalActive(), "Component is locally active");
+	BOOST_TEST(!Component->isActive(), "Component is active");
 }
+
+BOOST_AUTO_TEST_CASE(NodeComponentIsActive)
+{
+	std::shared_ptr<sg::Node> Node(new sg::Node());
+	auto Component = Node->createComponent<sg::Component>();
+
+	BOOST_TEST((Component != nullptr), "Failed to create component");
+
+	BOOST_TEST(Node->isActive(), "Node is not active");
+	BOOST_TEST(Component->isActive(), "Component is not active");
+
+	Node->setActive(false);
+
+	BOOST_TEST(!Component->isActive(), "Component is active");
+	BOOST_TEST(Component->isLocalActive(), "Component is not locally active");
+
+	Node->setActive(true);
+	Component->setActive(false);
+
+	BOOST_TEST(!Component->isActive(), "Component is active");
+	BOOST_TEST(!Component->isLocalActive(), "Component is locally active");
+}
+
+BOOST_AUTO_TEST_CASE(NodeHasComponent)
+{
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+
+	auto Node = Scene->getRootNode()->addChildNode();
+	sg::Component *Component = new sg::Component();
+
+	Node->addComponent(Component);
+
+	BOOST_TEST(Node->hasComponent<sg::Component>(), "Component not found");
+}
+
+BOOST_AUTO_TEST_CASE(NodeDoesNotHaveComponent)
+{
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+
+	auto Node = Scene->getRootNode()->addChildNode();
+	sg::Component *Component = new sg::Component();
+
+	Node->addComponent(Component);
+
+	BOOST_TEST(!Node->hasComponent<InvalidComponent>(), "Component found");
+}
+
+BOOST_AUTO_TEST_CASE(NodeGetComponent)
+{
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+
+	auto Node = Scene->getRootNode()->addChildNode();
+	sg::Component *Component = new sg::Component();
+
+	Node->addComponent(Component);
+
+	BOOST_TEST((Node->getComponent<sg::Component>() != nullptr), "Component not found");
+}
+
+BOOST_AUTO_TEST_CASE(ComponentHasNodeAndScene)
+{
+	sg::Component *Component = new sg::Component();
+
+	BOOST_TEST((Component->getScene() == nullptr), "Component belongs to a scene");
+	BOOST_TEST((Component->getNode() == nullptr), "Component belongs to a node");
+
+	delete Component;
+
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+
+	auto Node = Scene->getRootNode();
+	Component = Node->createComponent<sg::Component>();
+
+	BOOST_TEST((Component->getScene() != nullptr), "Component doesn't belongs to a scene");
+	BOOST_TEST((Component->getNode() != nullptr), "Component doesn't belongs to a node");
+}
+
+BOOST_AUTO_TEST_CASE(NodeGetInvalidComponent)
+{
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+
+	auto Node = Scene->getRootNode()->addChildNode();
+	sg::Component *Component = new sg::Component();
+
+	Node->addComponent(Component);
+
+	BOOST_TEST((Node->getComponent<InvalidComponent>() == nullptr), "Component found");
+}
+
+BOOST_AUTO_TEST_CASE(SceneEventComponent)
+{
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+
+	auto Node = Scene->getRootNode()->addChildNode();
+	auto Component = Node->createComponent<TestEventComponent>();
+
+	Component->registerEvents();
+
+	Scene->update(100.0f);
+
+	BOOST_TEST(Component->updated == 2, "Update events not called");
+}
+
+BOOST_AUTO_TEST_SUITE_END()

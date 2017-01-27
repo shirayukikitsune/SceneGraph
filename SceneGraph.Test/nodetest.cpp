@@ -1,135 +1,129 @@
-#include "stdafx.h"
-#include "CppUnitTest.h"
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE kitsune::scenegraph::Node
+#include <boost/test/unit_test.hpp>
 
-#include "../SceneGraph/Base/Component.h"
-#include "../SceneGraph/Base/Node.h"
-#include "../SceneGraph/Base/Scene.h"
+#include "Base/Component.h"
+#include "Base/Node.h"
+#include "Base/Scene.h"
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace sg = kitsune::scenegraph;
 
-namespace SceneGraphTest
-{
+std::shared_ptr<sg::Scene> makeScene() {
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
 
-	TEST_CLASS(NodeTest)
-	{
-	private:
-		std::shared_ptr<sg::Scene> makeScene() {
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-
-			return Scene;
-		}
-
-	public:
-		TEST_METHOD(AddChildNode)
-		{
-			auto Scene = makeScene();
-			auto RootNode = Scene->getRootNode();
-
-			Assert::IsNotNull(RootNode, L"Scene without root node");
-
-			auto ChildNode = RootNode->addChildNode();
-
-			Assert::IsTrue((bool)ChildNode, L"Failed to create child node");
-			Assert::IsTrue((bool)ChildNode->getParentNode(), L"Child node without parent");
-			Assert::IsTrue(ChildNode->getParentNode().get() == RootNode, L"Parent is not root");
-		}
-
-		TEST_METHOD(NodeTransform)
-		{
-			auto Scene = makeScene();
-			auto RootNode = Scene->getRootNode();
-			btTransform testTransform(btQuaternion(btVector3(0, 1, 0), SIMD_HALF_PI), btVector3(1, 0, 0));
-
-			Assert::IsNotNull(RootNode, L"Scene without root node");
-
-			RootNode->setLocalOffset(testTransform.getOrigin());
-			RootNode->setLocalRotation(testTransform.getRotation());
-
-			Assert::IsTrue(RootNode->getWorldTransform().getOrigin() == testTransform.getOrigin(), L"Invalid world position");
-			Assert::IsTrue(RootNode->getLocalOffset() == testTransform.getOrigin(), L"Invalid local position");
-			Assert::IsTrue(RootNode->getWorldTransform().getRotation() == testTransform.getRotation(), L"Invalid world rotation");
-			Assert::IsTrue(RootNode->getLocalRotation() == testTransform.getRotation(), L"Invalid local rotation");
-
-			RootNode->resetTransform();
-
-			Assert::IsTrue(RootNode->getLocalTransform() == btTransform::getIdentity(), L"Root node with non-identity local transform");
-			Assert::IsTrue(RootNode->getWorldTransform() == btTransform::getIdentity(), L"Root node with non-identity world transform");
-
-			RootNode->setWorldTransform(testTransform);
-
-			Assert::IsTrue(RootNode->getWorldTransform() == testTransform, L"Root node with invalid world transform");
-
-			RootNode->resetTransform();
-
-			RootNode->setLocalTransform(testTransform);
-
-			Assert::IsTrue(RootNode->getLocalTransform() == testTransform, L"Root node with invalid local transform");
-		}
-
-		TEST_METHOD(NodeTransformPropagation)
-		{
-			auto Scene = makeScene();
-			auto RootNode = Scene->getRootNode();
-			btTransform testTransform(btQuaternion(btVector3(0, 1, 0), SIMD_HALF_PI), btVector3(1, 0, 0));
-
-			Assert::IsNotNull(RootNode, L"Scene without root node");
-
-			RootNode->setLocalTransform(testTransform);
-			auto ChildNode = RootNode->addChildNode();
-
-			Assert::IsTrue(ChildNode->getWorldTransform().getOrigin() == testTransform.getOrigin(), L"Invalid world position");
-			Assert::IsTrue(ChildNode->getWorldTransform().getRotation() == testTransform.getRotation(), L"Invalid world rotation");
-
-			Assert::IsTrue(ChildNode->getLocalTransform().getOrigin() == btVector3(0, 0, 0), L"Invalid local position");
-			Assert::IsTrue(ChildNode->getLocalTransform().getRotation() == btQuaternion::getIdentity(), L"Invalid local rotation");
-
-			Assert::IsTrue(ChildNode->getTransformToOrigin() == testTransform.inverse(), L"Invalid transform to origin");
-
-			RootNode->resetTransform();
-
-			Assert::IsTrue(ChildNode->getWorldTransform().getOrigin() == btVector3(0, 0, 0), L"Invalid world position");
-			Assert::IsTrue(ChildNode->getWorldTransform().getRotation() == btQuaternion::getIdentity(), L"Invalid world rotation");
-
-			Assert::IsTrue(ChildNode->getTransformToOrigin() == btTransform::getIdentity(), L"Invalid transform to origin");
-		}
-
-		TEST_METHOD(NodeActive)
-		{
-			auto Scene = makeScene();
-			auto RootNode = Scene->getRootNode();
-
-			Assert::IsNotNull(RootNode, L"Scene without root node");
-
-			auto ChildNode = RootNode->addChildNode();
-
-			Assert::IsTrue(ChildNode->isActive(), L"Expected default values");
-
-			ChildNode->setActive(false);
-
-			Assert::IsFalse(ChildNode->isActive(), L"Child node is active");
-			Assert::IsTrue(RootNode->isActive(), L"Root node is not active");
-
-			ChildNode->setActive(true);
-			RootNode->setActive(false);
-
-			Assert::IsFalse(ChildNode->isActive(), L"Child node is active");
-			Assert::IsFalse(RootNode->isActive(), L"Root node is active");
-		}
-
-		TEST_METHOD(NodeScene)
-		{
-			std::shared_ptr<sg::Node> Node(new sg::Node(std::weak_ptr<sg::Scene>()));
-
-			Assert::IsTrue(Node->getScene() == nullptr, L"Unexpected scene for node");
-			Assert::IsTrue(Node->getParentNode() == nullptr, L"Unexpected parent node");
-
-			auto Child = Node->addChildNode();
-
-			Assert::IsTrue(Child->getScene() == nullptr, L"Unexpected scene for child");
-			Assert::IsFalse(Child->getParentNode() == nullptr, L"Expected parent node");
-		}
-	};
-
+	return Scene;
 }
+
+BOOST_AUTO_TEST_SUITE(Node)
+
+BOOST_AUTO_TEST_CASE(AddChildNode)
+{
+	auto Scene = makeScene();
+	auto RootNode = Scene->getRootNode();
+
+	BOOST_TEST((RootNode != nullptr), "Scene without root node");
+
+	auto ChildNode = RootNode->addChildNode();
+
+	BOOST_TEST((bool)ChildNode, "Failed to create child node");
+	BOOST_TEST((bool)ChildNode->getParentNode(), "Child node without parent");
+	BOOST_TEST((ChildNode->getParentNode().get() == RootNode), "Parent is not root");
+}
+
+BOOST_AUTO_TEST_CASE(NodeTransform)
+{
+	auto Scene = makeScene();
+	auto RootNode = Scene->getRootNode();
+	btTransform testTransform(btQuaternion(btVector3(0, 1, 0), SIMD_HALF_PI), btVector3(1, 0, 0));
+
+	BOOST_TEST((RootNode != nullptr), "Scene without root node");
+
+	RootNode->setLocalOffset(testTransform.getOrigin());
+	RootNode->setLocalRotation(testTransform.getRotation());
+
+	BOOST_TEST((RootNode->getWorldTransform().getOrigin() == testTransform.getOrigin()), "Invalid world position");
+	BOOST_TEST((RootNode->getLocalOffset() == testTransform.getOrigin()), "Invalid local position");
+	BOOST_TEST((RootNode->getWorldTransform().getRotation() == testTransform.getRotation()), "Invalid world rotation");
+	BOOST_TEST((RootNode->getLocalRotation() == testTransform.getRotation()), "Invalid local rotation");
+
+	RootNode->resetTransform();
+
+	BOOST_TEST((RootNode->getLocalTransform() == btTransform::getIdentity()), "Root node with non-identity local transform");
+	BOOST_TEST((RootNode->getWorldTransform() == btTransform::getIdentity()), "Root node with non-identity world transform");
+
+	RootNode->setWorldTransform(testTransform);
+
+	BOOST_TEST((RootNode->getWorldTransform() == testTransform), "Root node with invalid world transform");
+
+	RootNode->resetTransform();
+
+	RootNode->setLocalTransform(testTransform);
+
+	BOOST_TEST((RootNode->getLocalTransform() == testTransform), "Root node with invalid local transform");
+}
+
+BOOST_AUTO_TEST_CASE(NodeTransformPropagation)
+{
+	auto Scene = makeScene();
+	auto RootNode = Scene->getRootNode();
+	btTransform testTransform(btQuaternion(btVector3(0, 1, 0), SIMD_HALF_PI), btVector3(1, 0, 0));
+
+	BOOST_TEST((RootNode != nullptr), "Scene without root node");
+
+	RootNode->setLocalTransform(testTransform);
+	auto ChildNode = RootNode->addChildNode();
+
+	BOOST_TEST((ChildNode->getWorldTransform().getOrigin() == testTransform.getOrigin()), "Invalid world position");
+	BOOST_TEST((ChildNode->getWorldTransform().getRotation() == testTransform.getRotation()), "Invalid world rotation");
+
+	BOOST_TEST((ChildNode->getLocalTransform().getOrigin() == btVector3(0, 0, 0)), "Invalid local position");
+	BOOST_TEST((ChildNode->getLocalTransform().getRotation() == btQuaternion::getIdentity()), "Invalid local rotation");
+
+	BOOST_TEST((ChildNode->getTransformToOrigin() == testTransform.inverse()), "Invalid transform to origin");
+
+	RootNode->resetTransform();
+
+	BOOST_TEST((ChildNode->getWorldTransform().getOrigin() == btVector3(0, 0, 0)), "Invalid world position");
+	BOOST_TEST((ChildNode->getWorldTransform().getRotation() == btQuaternion::getIdentity()), "Invalid world rotation");
+
+	BOOST_TEST((ChildNode->getTransformToOrigin() == btTransform::getIdentity()), "Invalid transform to origin");
+}
+
+BOOST_AUTO_TEST_CASE(NodeActive)
+{
+	auto Scene = makeScene();
+	auto RootNode = Scene->getRootNode();
+
+	BOOST_TEST((RootNode != nullptr), "Scene without root node");
+
+	auto ChildNode = RootNode->addChildNode();
+
+	BOOST_TEST(ChildNode->isActive(), "Expected default values");
+
+	ChildNode->setActive(false);
+
+	BOOST_TEST(!ChildNode->isActive(), "Child node is active");
+	BOOST_TEST(RootNode->isActive(), "Root node is not active");
+
+	ChildNode->setActive(true);
+	RootNode->setActive(false);
+
+	BOOST_TEST(!ChildNode->isActive(), "Child node is active");
+	BOOST_TEST(!RootNode->isActive(), "Root node is active");
+}
+
+BOOST_AUTO_TEST_CASE(NodeScene)
+{
+	std::shared_ptr<sg::Node> Node(new sg::Node(std::weak_ptr<sg::Scene>()));
+
+	BOOST_TEST((Node->getScene() == nullptr), "Unexpected scene for node");
+	BOOST_TEST((Node->getParentNode() == nullptr), "Unexpected parent node");
+
+	auto Child = Node->addChildNode();
+
+	BOOST_TEST((Child->getScene() == nullptr), "Unexpected scene for child");
+	BOOST_TEST((Child->getParentNode() != nullptr), "Expected parent node");
+}
+
+BOOST_AUTO_TEST_SUITE_END()

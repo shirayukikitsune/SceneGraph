@@ -1,77 +1,73 @@
-#include "stdafx.h"
-#include "CppUnitTest.h"
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_MODULE kitsune::scenegraph::Scene
+#include <boost/test/unit_test.hpp>
 
-#include "../SceneGraph/Base/Component.h"
-#include "../SceneGraph/Base/Node.h"
-#include "../SceneGraph/Base/Scene.h"
+#include "Base/Component.h"
+#include "Base/Node.h"
+#include "Base/Scene.h"
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace sg = kitsune::scenegraph;
+namespace utf = boost::unit_test;
 
-namespace SceneGraphTest
+BOOST_AUTO_TEST_SUITE(Component)
+
+BOOST_AUTO_TEST_CASE(SceneUpdateEvent, * utf::tolerance(0.0001))
 {
+	bool updated = false;
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+	auto updateEvent = Scene->addUpdateEvent([&updated](float DeltaTime) {
+		BOOST_TEST(DeltaTime == 100.0f, "Invalid DeltaTime");
+		updated = true;
+	});
 
-	TEST_CLASS(SceneTest)
-	{
-	public:
-		TEST_METHOD(SceneUpdateEvent)
-		{
-			bool updated = false;
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-			auto updateEvent = Scene->addUpdateEvent([&updated](float DeltaTime) {
-				Assert::AreEqual(100.0f, DeltaTime, 0.0f, L"Invalid DeltaTime");
-				updated = true;
-			});
+	Scene->update(100.0f);
 
-			Scene->update(100.0f);
-
-			Assert::IsTrue(updated, L"Update event was not called");
-		}
-		
-		TEST_METHOD(ScenePreUpdateEvent)
-		{
-			bool updated = false;
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-			auto preUpdateEvent = Scene->addPreUpdateEvent([&updated](float DeltaTime) {
-				Assert::AreEqual(100.0f, DeltaTime, 0.0f, L"Invalid DeltaTime");
-				updated = true;
-			});
-
-			Scene->update(100.0f);
-
-			Assert::IsTrue(updated, L"Pre-update event was not called");
-		}
-
-		TEST_METHOD(SceneUpdateOrder)
-		{
-			unsigned int updated = 0;
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-			auto preUpdateEvent = Scene->addPreUpdateEvent([&updated](float DeltaTime) {
-				Assert::AreEqual(100.0f, DeltaTime, 0.0f, L"Invalid DeltaTime");
-				updated = 1;
-			});
-			auto updateEvent = Scene->addUpdateEvent([&updated](float DeltaTime) {
-				Assert::AreEqual(100.0f, DeltaTime, 0.0f, L"Invalid DeltaTime");
-				Assert::IsTrue(updated == 1, L"Invalid update order (update ran before pre-update)");
-				updated = 2;
-			});
-
-
-			Scene->update(100.0f);
-
-			Assert::IsTrue(updated == 2, L"Update event was not called");
-		}
-
-		TEST_METHOD(SceneHasRootNode)
-		{
-			std::shared_ptr<sg::Scene> Scene(new sg::Scene);
-			Scene->initialize();
-			
-			Assert::IsNotNull(Scene->getRootNode(), L"Scene without root node");
-		}
-	};
-
+	BOOST_TEST(updated, "Update event was not called");
 }
+
+BOOST_AUTO_TEST_CASE(ScenePreUpdateEvent, * utf::tolerance(0.0001))
+{
+	bool updated = false;
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+	auto preUpdateEvent = Scene->addPreUpdateEvent([&updated](float DeltaTime) {
+		BOOST_TEST(DeltaTime == 100.0f, "Invalid DeltaTime");
+		updated = true;
+	});
+
+	Scene->update(100.0f);
+
+	BOOST_TEST(updated, "Pre-update event was not called");
+}
+
+BOOST_AUTO_TEST_CASE(SceneUpdateOrder, * utf::tolerance(0.0001))
+{
+	unsigned int updated = 0;
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+	auto preUpdateEvent = Scene->addPreUpdateEvent([&updated](float DeltaTime) {
+		BOOST_TEST(DeltaTime == 100.0f, "Invalid DeltaTime");
+		updated = 1;
+	});
+	auto updateEvent = Scene->addUpdateEvent([&updated](float DeltaTime) {
+		BOOST_TEST(DeltaTime == 100.0f, "Invalid DeltaTime");
+		BOOST_TEST(updated == 1, "Invalid update order (update ran before pre-update)");
+		updated = 2;
+	});
+
+
+	Scene->update(100.0f);
+
+	BOOST_TEST(updated == 2, "Update event was not called");
+}
+
+BOOST_AUTO_TEST_CASE(SceneHasRootNode)
+{
+	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
+	Scene->initialize();
+	
+	BOOST_TEST((Scene->getRootNode() != nullptr), "Scene without root node");
+}
+
+BOOST_AUTO_TEST_SUITE_END()

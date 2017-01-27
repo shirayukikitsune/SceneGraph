@@ -1,12 +1,25 @@
 cmake_minimum_required(VERSION 3.1)
 project(KITSUNE_SCENEGRAPH)
+enable_testing()
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
+option(EnableTest "Enable unit testing" ON)
+
 find_package(Bullet REQUIRED)
+# Check for boost test, but it is not required
+find_package(Boost 1.59 COMPONENTS unit_test_framework)
+
+if (NOT Boost_FOUND)
+    message(AUTHOR_WARNING "boost test >= 1.59 not found, disabling unit testing!")
+endif()
 
 include_directories(${BULLET_INCLUDE_DIR})
 set(LIBS ${LIBS} ${BULLET_LIBRARIES})
 
 add_subdirectory(SceneGraph)
+
+if (Boost_FOUND AND EnableTest)
+    add_subdirectory(SceneGraph.Test)
+endif()

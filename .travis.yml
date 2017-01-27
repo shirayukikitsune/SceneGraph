@@ -4,10 +4,12 @@ compiler:
     - gcc
 
 before_install:
-    - sudo apt-get install -y libbullet-dev
+    - sudo apt-get update -qq
+    - sudo apt-get install -y libbullet-dev libboost-test-dev
 
 script:
     - mkdir build
     - cd build
     - cmake ..
     - make
+    - ctest -V

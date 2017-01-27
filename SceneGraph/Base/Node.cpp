@@ -28,16 +28,21 @@ bool Node::isActive() const
 	return true;
 }
 
-void Node::addComponent(std::size_t typehash, sg::Component * Component)
+void Node::addComponent(std::size_t typehash, std::unique_ptr<sg::Component> && Component)
 {
 	if (!Component)
 		return;
 
 	Component->setNode(shared_from_this());
-	std::unique_ptr<sg::Component> NewComponent(Component);
-    Components.emplace(typehash, std::move(NewComponent));
+    Components.emplace(typehash, std::move(Component));
 
-	componentAddedEvent(Component);
+	componentAddedEvent(Component.get());
+}
+
+void Node::addComponent(std::size_t typehash, sg::Component * Component)
+{
+	std::unique_ptr<sg::Component> NewComponent(Component);
+	addComponent(typehash, std::move(NewComponent));
 }
 
 bool Node::hasComponent(std::size_t typehash)
