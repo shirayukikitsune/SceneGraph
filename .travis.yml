@@ -2,13 +2,7 @@ language: cpp
 sudo: required
 dist: trusty
 cache: ccache
-compiler:
-    - clang
-    - gcc
-
-before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get install libc++abi-dev libc++-dev -y
+compiler: gcc
 
 install:
     - wget https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.bz2/download -O boost.tar.bz2
@@ -21,8 +15,6 @@ install:
     - git clone https://github.com/bulletphysics/bullet3.git
     - mkdir bullet-build
     - cd bullet-build
-    - if [ "$CXX" == "clang++" ]; then export CXXFLAGS="-stdlib=libc++ -I/usr/include/libcxxabi"; fi
-    - if [ "$CXX" == "clang++" ]; then export LDFLAGS=-stdlib=libc++; fi
     - cmake ../bullet3 -G "Unix Makefiles" -DUSE_GRAPHICAL_BENCHMARK=OFF -DBUILD_CPU_DEMOS=OFF -DUSE_GLUT=OFF -DBUILD_BULLET3=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF
     - make -j4 -s
     - sudo make install
@@ -31,8 +23,6 @@ install:
 script:
     - mkdir build
     - cd build
-    - if [ "$CXX" == "clang++" ]; then export CXXFLAGS="-stdlib=libc++ -I/usr/include/libcxxabi"; fi
-    - if [ "$CXX" == "clang++" ]; then export LDFLAGS=-stdlib=libc++; fi
     - cmake ..
     - make -j4
     - ctest -V
