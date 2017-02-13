@@ -21,7 +21,7 @@ install:
     - git clone https://github.com/bulletphysics/bullet3.git
     - mkdir bullet-build
     - cd bullet-build
-    - if [ "$CXX" == "clang++" ]; then export CXXFLAGS=-stdlib=libc++ -I/usr/include/libcxxabi; fi
+    - if [ "$CXX" == "clang++" ]; then export CXXFLAGS="-stdlib=libc++ -I/usr/include/libcxxabi"; fi
     - if [ "$CXX" == "clang++" ]; then export LDFLAGS=-stdlib=libc++; fi
     - cmake ../bullet3 -G "Unix Makefiles" -DUSE_GRAPHICAL_BENCHMARK=OFF -DBUILD_CPU_DEMOS=OFF -DUSE_GLUT=OFF -DBUILD_BULLET3=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_EXTRAS=OFF -DBUILD_UNIT_TESTS=OFF
     - make -j4 -s
@@ -31,7 +31,7 @@ install:
 script:
     - mkdir build
     - cd build
-    - if [ "$CXX" == "clang++" ]; then export CXXFLAGS=-stdlib=libc++ -I/usr/include/libcxxabi; fi
+    - if [ "$CXX" == "clang++" ]; then export CXXFLAGS="-stdlib=libc++ -I/usr/include/libcxxabi"; fi
     - if [ "$CXX" == "clang++" ]; then export LDFLAGS=-stdlib=libc++; fi
     - cmake ..
     - make -j4
