@@ -15,10 +15,7 @@ install:
     - tar -xjf boost.tar.bz2
     - cd boost_1_63_0
     - ./bootstrap.sh
-    # For clang:
-    - if [ "$CXX" == "clang++" ]; then sudo ./b2 install --with-test -j4 cxxflags="-stdlib=libc++ -I/usr/include/libcxxabi" linkflags="-stdlib=libc++" -d0; fi
-    # For g++
-    - if [ "$CXX" == "g++" ]; then sudo ./b2 install --with-test -j4 -d0; fi
+    - sudo ./b2 install --with-test -j4 -d0
     - cd ..
 
     - git clone https://github.com/bulletphysics/bullet3.git
