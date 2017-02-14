@@ -226,13 +226,15 @@ void RigidBodyComponent::onNodeSet()
 	auto CollisionShape = node->getComponent<CollisionShapeComponent>();
 	if (CollisionShape != nullptr) {
 		RigidBody->setCollisionShape(CollisionShape->getCollisionShape());
-		DefaultShape.reset();
 
 		if (CollisionShape->getShape() != CollisionShapeComponent::ShapeFormat::Null)
 			CollisionShape->getCollisionShape()->calculateLocalInertia(ConstructionInfo.m_mass, ConstructionInfo.m_localInertia);
-
-		RigidBody->setMassProps(ConstructionInfo.m_mass, ConstructionInfo.m_localInertia);
 	}
+	else {
+		RigidBody->setCollisionShape(DefaultShape.get());
+	}
+
+	RigidBody->setMassProps(ConstructionInfo.m_mass, ConstructionInfo.m_localInertia);
 
 	physicsScene->getWorld()->removeRigidBody(RigidBody.get());
 	physicsScene->getWorld()->addRigidBody(RigidBody.get(), Group, Mask);

@@ -11,7 +11,7 @@ namespace utf = boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(Component)
 
-BOOST_AUTO_TEST_CASE(SceneUpdateEvent, * utf::tolerance(0.0001))
+BOOST_AUTO_TEST_CASE(SceneUpdateEvent, * utf::tolerance(0.0001f))
 {
 	bool updated = false;
 	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(SceneUpdateEvent, * utf::tolerance(0.0001))
 	BOOST_TEST(updated, "Update event was not called");
 }
 
-BOOST_AUTO_TEST_CASE(ScenePreUpdateEvent, * utf::tolerance(0.0001))
+BOOST_AUTO_TEST_CASE(ScenePreUpdateEvent, * utf::tolerance(0.0001f))
 {
 	bool updated = false;
 	std::shared_ptr<sg::Scene> Scene(new sg::Scene);
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(ScenePreUpdateEvent, * utf::tolerance(0.0001))
 	BOOST_TEST(updated, "Pre-update event was not called");
 }
 
-BOOST_AUTO_TEST_CASE(SceneUpdateOrder, * utf::tolerance(0.0001))
+BOOST_AUTO_TEST_CASE(SceneUpdateOrder, * utf::tolerance(0.0001f))
 {
 	unsigned int updated = 0;
 	std::shared_ptr<sg::Scene> Scene(new sg::Scene);

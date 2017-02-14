@@ -15,15 +15,18 @@ namespace scenegraph {
 		~PhysicsScene();
 
 		void setGravity(const btVector3 & Gravity);
+		void setFps(float Fps);
 
 		btSoftRigidDynamicsWorld * getWorld();
 
 	protected:
-		virtual void onInit();
+		virtual void onPreInit();
 
 		virtual void onUpdate(float DeltaTime);
 
 	private:
+		static void worldTickCallback(btDynamicsWorld *World, btScalar TimeStep);
+
 		updateCallback prePhysicsUpdateEvents;
 
 		updateCallback physicsUpdateEvents;
@@ -34,6 +37,9 @@ namespace scenegraph {
 		std::unique_ptr<btConstraintSolver> ConstraintSolver;
 		std::unique_ptr<btSoftRigidDynamicsWorld> DynamicsWorld;
 		std::unique_ptr<btSoftBodySolver> SoftBodySolver;
+
+		float FrameTime;
+		btVector3 Gravity;
 	};
 
 }

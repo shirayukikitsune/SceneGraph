@@ -9,10 +9,11 @@
 
 using kitsune::scenegraph::PhysicsScene;
 
-PhysicsScene::PhysicsScene()
+PhysicsScene::PhysicsScene() :
+	Gravity(0, -9.8f, 0)
 {
+	this->FrameTime = 1 / 60.0f;
 }
-
 
 PhysicsScene::~PhysicsScene()
 {
@@ -20,8 +21,15 @@ PhysicsScene::~PhysicsScene()
 
 void PhysicsScene::setGravity(const btVector3 & Gravity)
 {
+	this->Gravity = Gravity;
+
 	if (DynamicsWorld)
 		DynamicsWorld->setGravity(Gravity);
+}
+
+void PhysicsScene::setFps(float Fps)
+{
+	this->FrameTime = 1 / Fps;
 }
 
 btSoftRigidDynamicsWorld * PhysicsScene::getWorld()
@@ -29,7 +37,7 @@ btSoftRigidDynamicsWorld * PhysicsScene::getWorld()
 	return DynamicsWorld.get();
 }
 
-void PhysicsScene::onInit()
+void PhysicsScene::onPreInit()
 {
 	Broadphase.reset(new btDbvtBroadphase);
 	assert(Broadphase != nullptr);
@@ -49,14 +57,19 @@ void PhysicsScene::onInit()
 	DynamicsWorld.reset(new btSoftRigidDynamicsWorld(CollisionDispatcher.get(), Broadphase.get(), ConstraintSolver.get(), CollisionConfiguration.get(), SoftBodySolver.get()));
 	assert(DynamicsWorld != nullptr);
 
-	DynamicsWorld->setGravity(btVector3(0, -9.8f, 0));
+	DynamicsWorld->setGravity(this->Gravity);
+	DynamicsWorld->setInternalTickCallback(PhysicsScene::worldTickCallback, this);
 }
 
 void PhysicsScene::onUpdate(float DeltaTime)
 {
 	prePhysicsUpdateEvents(DeltaTime);
 
-	DynamicsWorld->stepSimulation(DeltaTime);
+	DynamicsWorld->stepSimulation(DeltaTime, std::max(1, (int)(DeltaTime / this->FrameTime)) * 10, this->FrameTime);
+}
 
-	physicsUpdateEvents(DeltaTime);
+void PhysicsScene::worldTickCallback(btDynamicsWorld *World, btScalar TimeStep)
+{
+	PhysicsScene *scene = static_cast<PhysicsScene*>(World->getWorldUserInfo());
+	scene->physicsUpdateEvents(TimeStep);
 }

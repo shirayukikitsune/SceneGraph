@@ -45,7 +45,10 @@ namespace scenegraph {
 
 		MultiPtr(MultiPtr && p) noexcept
 		{
-			count = 0;
+			count = p.count;
+			ptr = p.ptr;
+			deleter = p.deleter;
+			p.ptr = nullptr;
 		}
 
 		MultiPtr(const MultiPtr&) = delete;
@@ -64,8 +67,7 @@ namespace scenegraph {
 
 		pointer operator->() const noexcept
 		{
-			std::any
-			return std::pointer_traits<pointer>::pointer_to(**this);
+			return std::pointer_traits<pointer>::pointer_to(*this);
 		}
 
 		pointer get() const noexcept
@@ -89,7 +91,7 @@ namespace scenegraph {
 			this->ptr = p;
 			if (old != pointer())
 				deleter(old);
-			count = 0;
+			count = this->ptr ? 1 : 0;
 		}
 
 		bool expired() const noexcept

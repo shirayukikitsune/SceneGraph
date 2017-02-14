@@ -33,10 +33,12 @@ void Node::addComponent(std::size_t typehash, std::unique_ptr<sg::Component> && 
 	if (!Component)
 		return;
 
+	sg::Component *ptr = Component.get();
+
 	Component->setNode(shared_from_this());
     Components.emplace(typehash, std::move(Component));
 
-	componentAddedEvent(Component.get());
+	componentAddedEvent(ptr);
 }
 
 void Node::addComponent(std::size_t typehash, sg::Component * Component)
