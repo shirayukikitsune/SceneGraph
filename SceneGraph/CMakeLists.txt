@@ -10,6 +10,7 @@ set(HEADER_FILES
         Components/ConstraintComponent.h
         Components/RigidBodyComponent.h
         Components/SceneEventComponent.h
+        Util/Util.h
     )
 
 add_library(scenegraph
@@ -21,6 +22,7 @@ add_library(scenegraph
         Components/ConstraintComponent.cpp
         Components/RigidBodyComponent.cpp
         Components/SceneEventComponent.cpp
+        Util/Util.cpp
     )
 
 target_include_directories(scenegraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -38,6 +40,7 @@ PROPERTIES
 )   
 
 install(TARGETS scenegraph
+        FRAMEWORK DESTINATION lib
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib)
 
