@@ -2,14 +2,17 @@ cmake_minimum_required(VERSION 3.1)
 project(KITSUNE_SCENEGRAPH)
 enable_testing()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMake")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 option(EnableTest "Enable unit testing" ON)
 
 find_package(Bullet REQUIRED)
-# Check for boost test, but it is not required
-find_package(Boost 1.59 COMPONENTS unit_test_framework)
+if (EnableTest)
+    # Check for boost test, but it is not required
+    find_package(Boost 1.59 COMPONENTS unit_test_framework)
+endif()
 # SDL 2 isn't required. If found, build SDL module
 find_package(SDL2)
 find_package(OpenGL)

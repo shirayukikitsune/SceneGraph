@@ -57,13 +57,13 @@ Scene::updateCallback::auto_remover_type Scene::addUpdateEvent(const Scene::upda
 	return updateEvents.push_auto(function);
 }
 
-void Scene::addTaggedNode(const std::string & Tag, std::shared_ptr<Node> Node)
+void Scene::addTaggedNode(const std::string & Tag, std::shared_ptr<kitsune::scenegraph::Node> Node)
 {
 	// We assume that the node isn't being added twice to the map!
 	this->TaggedNodes.emplace(Tag, Node);
 }
 
-void Scene::removeTaggedNode(const std::string & Tag, std::shared_ptr<Node> Node)
+void Scene::removeTaggedNode(const std::string & Tag, std::shared_ptr<kitsune::scenegraph::Node> Node)
 {
 	// First find the reference
 	auto tagRange = this->TaggedNodes.equal_range(Tag);

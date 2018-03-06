@@ -2,6 +2,9 @@
 
 #include <exception>
 #include <string>
+#ifdef WIN32
+#include <Windows.h>
+#endif
 #include <SDL2/SDL.h>
 
 namespace kitsune {

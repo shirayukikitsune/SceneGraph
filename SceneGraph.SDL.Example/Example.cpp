@@ -22,6 +22,7 @@ kitsune::scenegraph::sdl::Bootstrap * AppBootstrap = new ExampleApplication;
 ExampleApplication::ExampleApplication()
 {
     Run = true;
+    currentTime = 0;
 }
 
 void ExampleApplication::onInitializing(sg::sdl::Application * Application)
@@ -53,12 +54,13 @@ void ExampleApplication::onInitialized()
     Node->setName("Plane");
 
     auto CollisionShape = Node->createComponent<sg::CollisionShapeComponent>();
+    CollisionShape->setDimentions(btVector3(0, 1, 0));
     CollisionShape->setShape(sg::CollisionShapeComponent::ShapeFormat::Plane);
     
+    auto RigidBody = Node->createComponent<sg::RigidBodyComponent>(0, sg::RigidBodyComponent::RigidBodyType::Static);
+
     Node = Scene->getRootNode()->addChildNode();
     Node->setLocalOffset(btVector3(0, 5.0f, 0));
-
-    auto RigidBody = Node->createComponent<sg::RigidBodyComponent>(0, sg::RigidBodyComponent::RigidBodyType::Static);
 
     CollisionShape = Node->createComponent<sg::CollisionShapeComponent>();
     CollisionShape->setDimentions(btVector3(1, 1, 1));

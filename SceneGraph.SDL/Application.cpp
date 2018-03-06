@@ -10,6 +10,7 @@ using kitsune::scenegraph::sdl::Application;
 Application::Application(kitsune::scenegraph::sdl::Bootstrap *Bootstrap)
 	: Bootstrap(Bootstrap), WindowTitle("Kitsune Scenegraph SDL Application")
 {
+    Graphics = nullptr;
 }
 
 Application::~Application()
