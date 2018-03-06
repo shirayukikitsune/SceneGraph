@@ -13,8 +13,8 @@ add_library(scenegraph-sdl
         Events/SDLEventHandler.cpp
     )
 
-target_include_directories(scenegraph-sdl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../Scenegraph ${SDL2_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
-target_link_libraries(scenegraph-sdl INTERFACE scenegraph ${SDL2_LIBRARY} ${OPENGL_gl_LIBRARY})
+target_include_directories(scenegraph-sdl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../glad/include ${CMAKE_CURRENT_SOURCE_DIR}/../Scenegraph ${SDL2_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
+target_link_libraries(scenegraph-sdl LINK_INTERFACE_LIBRARIES scenegraph glad ${SDL2_LIBRARY})
 
 set_target_properties( 
     scenegraph

@@ -31,6 +31,7 @@ if (Boost_FOUND AND EnableTest)
 endif()
 
 if (SDL2_FOUND)
+    add_subdirectory(glad)
     add_subdirectory(SceneGraph.SDL)
     add_subdirectory(SceneGraph.SDL.Example)
 endif()

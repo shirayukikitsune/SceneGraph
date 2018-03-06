@@ -1,35 +1,39 @@
 #include "Graphics.h"
 
+#include <glad/glad.h>
 #include <SDL2/SDL.h>
-
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
 
 using kitsune::scenegraph::sdl::Graphics;
 
 Graphics::Graphics(int Width, int Height)
 {
-    this->Window = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_OPENGL);
-    if (!Window) {
-        throw Graphics::Exception(SDL_GetError());
-    }
+    SDL_GL_LoadLibrary(NULL);
 
+    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     // Set OpenGL Core profile
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     // Set a context flag to force only recent OpenGL functions
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-    // Enable double buffer
+    // Enable double buffer and depth buffer
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    // Set min version as OpenGL 4.0
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    // Set min version as OpenGL 4.0 Core
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+
+    this->Window = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
+    if (!Window) {
+        throw Graphics::Exception(SDL_GetError());
+    }
 
     this->Context = SDL_GL_CreateContext(this->Window);
     if (!Context) {
         throw Graphics::Exception(SDL_GetError());
+    }
+
+    // Initialize glad
+    if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
+        throw Graphics::Exception("Failed to initialize GLAD");
     }
 
     // set a black clear color as default

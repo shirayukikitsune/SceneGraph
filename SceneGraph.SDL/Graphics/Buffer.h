@@ -1,10 +1,6 @@
 #pragma once
 
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#include <glad/glad.h>
 
 namespace kitsune {
 namespace scenegraph {
@@ -45,12 +41,45 @@ namespace graphics {
     };
 
     GLenum convertBufferTarget(BufferTarget target);
+    GLenum convertBufferFrequencyAndAccess(BufferFrequency frequency, BufferAccess access);
 
-    template <typename DataType, typename GraphicsType>
-    class Buffer {
+    template <typename DataType, typename GraphicsType, int bufferCount>
+    class ArrayBuffer {
         // Disable buffer copy
-        Buffer(const Buffer&) = delete;
-        Buffer& operator= (const Buffer&) = delete;
+        ArrayBuffer(const ArrayBuffer&) = delete;
+        ArrayBuffer& operator= (const ArrayBuffer&) = delete;
+
+        GLuint bufferId[bufferCount];
+
+        std::unique_ptr<DataType[]> cpuBuffer[bufferCount];
+        GraphicsType gpuBuffer[bufferCount];
+
+    public:
+        ///! Initializes an empty buffer
+        explicit ArrayBuffer() {
+            std::copy(bufferId, bufferId + BufferCount, 0);
+        }
+
+        void createBuffers() {
+            this->freeBuffers();
+
+            glGenBuffers(bufferCount, bufferId);
+        }
+
+        void freeBuffers() {
+            glDeleteBuffers(bufferCount, bufferId);
+        }
+
+        ///! Returns the pointer to the internal buffer
+        /// \remarks the pointer should never be deleted
+        DataType* getCpuBuffer(int which) { return cpuBuffer[which].get(); }
+    };
+
+    template <typename D, typename G>
+    class ArrayBuffer<D, G, 1> {
+        // Disable buffer copy
+        ArrayBuffer(const ArrayBuffer&) = delete;
+        ArrayBuffer& operator= (const ArrayBuffer&) = delete;
 
         GLuint bufferId;
 
@@ -59,30 +88,36 @@ namespace graphics {
 
     public:
         ///! Initializes an empty buffer
-        explicit Buffer() {
-            cpuBuffer = nullptr;
+        explicit ArrayBuffer() {
+            bufferId = 0;
         }
 
         ///! Copies the `contents` of size `size` to this buffer
-        Buffer(DataType* contents, std::size_t size, BufferTarget target, BufferFrequency frequency, BufferAccess access)
+        ArrayBuffer(DataType* contents, std::size_t size, BufferTarget target, BufferFrequency frequency, BufferAccess access)
         {
+            bufferId = 0;
             this->createBuffer(contents, size);
-            glBindBuffer(convertBufferTarget(target), bufferId);
-            glBufferData(convertBufferTarget(target), size, contents, GL_STREAM_DRAW);
         }
 
         void createBuffer(DataType* contents, std::size_t size) {
             cpuBuffer = new DataType[size];
             std::copy(contents, contents + size, cpuBuffer.get());
 
+            if (bufferId != 0) {
+                glDeleteBuffers(1, &bufferId);
+            }
+
             glGenBuffers(1, &bufferId);
+            glBindBuffer(convertBufferTarget(target), bufferId);
+            glBufferData(convertBufferTarget(target), size, contents, convertBufferFrequencyAndAccess(frequency, access));
         }
 
         ///! Returns the pointer to the internal buffer
         /// \remarks the pointer should never be deleted
         DataType* getCpuBuffer() { return cpuBuffer.get(); }
-
     };
+
+    template <typename D, typename G> typedef ArrayBuffer<D, G, 1> Buffer;
 
 }
 }
