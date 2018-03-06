@@ -17,6 +17,12 @@ void SDLEventHandler::processEvents()
         case SDL_WINDOWEVENT:
             processWindowEvent(&Event.window);
             break;
+        case SDL_KEYDOWN:
+            fireHandler(sge::input::KeyDown, &Event.key);
+            break;
+        case SDL_KEYUP:
+            fireHandler(sge::input::KeyUp, &Event.key);
+            break;
         default:
             break;
         }

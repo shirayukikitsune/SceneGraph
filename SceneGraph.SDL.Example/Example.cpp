@@ -43,6 +43,13 @@ void ExampleApplication::onInitialized()
         this->Run = false;
     });
 
+    Application->getEventHandler()->addHandler(sg::events::input::KeyUp, [this](void* data) {
+        SDL_KeyboardEvent *evData = reinterpret_cast<SDL_KeyboardEvent*>(data);
+        if (evData->keysym.sym == SDLK_ESCAPE) {
+            this->Run = false;
+        }
+    });
+
     std::shared_ptr<sg::PhysicsScene> Scene(new sg::PhysicsScene);
 
 	Scene->setGravity(btVector3(0, -10.0f, 0));

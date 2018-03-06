@@ -14,14 +14,23 @@ namespace window {
 
 namespace application {
     enum EventType {
-        First = 0x100,
+        First = window::Last,
         Quit = First,
         Last
     };
 }
 
+namespace input {
+    enum EventType {
+        First = application::Last,
+        KeyDown = First,
+        KeyUp,
+        Last
+    };
+}
+
 constexpr unsigned getEventCount() {
-    return application::Last;
+    return input::Last;
 }
 
 }
