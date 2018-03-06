@@ -56,3 +56,22 @@ Scene::updateCallback::auto_remover_type Scene::addUpdateEvent(const Scene::upda
 {
 	return updateEvents.push_auto(function);
 }
+
+void Scene::addTaggedNode(const std::string & Tag, std::shared_ptr<Node> Node)
+{
+	// We assume that the node isn't being added twice to the map!
+	this->TaggedNodes.emplace(Tag, Node);
+}
+
+void Scene::removeTaggedNode(const std::string & Tag, std::shared_ptr<Node> Node)
+{
+	// First find the reference
+	auto tagRange = this->TaggedNodes.equal_range(Tag);
+	for (auto i = tagRange.first; i != tagRange.second; ++i) {
+		if (!(Node < i->second.lock()) && !(i->second.lock() < Node)) {
+			// This is the requested node, remove it
+			this->TaggedNodes.erase(i);
+			return;
+		}
+	}
+}

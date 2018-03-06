@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <string>
 
 #include <LinearMath/btTransform.h>
 
@@ -83,6 +84,14 @@ namespace scenegraph {
 
 		void resetTransform();
 
+		const std::string & getName() const { return Name; }
+		void setName(const std::string & name) { Name = name; }
+		void setName(std::string && name) { Name = std::move(name); }
+
+		const std::string & getTag() const { return Tag; }
+		void setTag(const std::string & tag);
+		void setTag(std::string && tag);
+
 		invalidatedByParentCallback::auto_remover_type addInvalidatedByParentEvent(invalidatedByParentCallback::function_type && function);
 		invalidatedByParentCallback::auto_remover_type addInvalidatedByParentEvent(const invalidatedByParentCallback::function_type & function);
 
@@ -101,6 +110,9 @@ namespace scenegraph {
 		btTransform LocalTransform;
 		btTransform WorldTransform;
 		bool RecalculateWorld;
+
+		std::string Name;
+		std::string Tag;
 
 		std::weak_ptr<Node> ParentNode;
         std::weak_ptr<Scene> ParentScene;
