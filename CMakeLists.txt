@@ -10,6 +10,9 @@ option(EnableTest "Enable unit testing" ON)
 find_package(Bullet REQUIRED)
 # Check for boost test, but it is not required
 find_package(Boost 1.59 COMPONENTS unit_test_framework)
+# SDL 2 isn't required. If found, build SDL module
+find_package(SDL2)
+find_package(OpenGL)
 
 if (NOT Boost_FOUND)
     message(AUTHOR_WARNING "boost test >= 1.59 not found, disabling unit testing!")
@@ -22,4 +25,9 @@ add_subdirectory(SceneGraph)
 
 if (Boost_FOUND AND EnableTest)
     add_subdirectory(SceneGraph.Test)
+endif()
+
+if (SDL2_FOUND)
+    add_subdirectory(SceneGraph.SDL)
+    add_subdirectory(SceneGraph.SDL.Example)
 endif()
