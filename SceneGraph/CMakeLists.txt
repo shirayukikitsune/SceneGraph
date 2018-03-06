@@ -10,10 +10,14 @@ set(HEADER_FILES
         Components/ConstraintComponent.h
         Components/RigidBodyComponent.h
         Components/SceneEventComponent.h
+        Events/EventHandler.h
+        Events/EventType.h
+        Util/Easing.h
         Util/Util.h
     )
 
 add_library(scenegraph
+        ${HEADER_FILES}
         Base/Component.cpp
         Base/Node.cpp
         Base/PhysicsScene.cpp
@@ -22,6 +26,8 @@ add_library(scenegraph
         Components/ConstraintComponent.cpp
         Components/RigidBodyComponent.cpp
         Components/SceneEventComponent.cpp
+        Events/EventHandler.cpp
+        Util/Easing.cpp
         Util/Util.cpp
     )
 
