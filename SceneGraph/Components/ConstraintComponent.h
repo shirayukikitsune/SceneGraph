@@ -14,7 +14,7 @@ namespace scenegraph {
 	class ConstraintComponent :
 		public Component
 	{
-		KIT_SG_COMPONENT(kitsune::scenegraph::ConstraintComponent);
+        KIT_SG_COMPONENT(kitsune::scenegraph::ConstraintComponent)
 
 	public:
 		enum class ConstraintType {
@@ -82,7 +82,7 @@ namespace scenegraph {
 		std::bitset<6> SpringActivation;
 
 	protected:
-		virtual void onNodeSet();
+        virtual void onNodeSet() override;
 	};
 
 }

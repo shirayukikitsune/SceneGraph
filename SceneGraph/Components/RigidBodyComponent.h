@@ -12,7 +12,7 @@ namespace scenegraph {
 	class RigidBodyComponent :
 		public Component
 	{
-		KIT_SG_COMPONENT(kitsune::scenegraph::RigidBodyComponent);
+        KIT_SG_COMPONENT(kitsune::scenegraph::RigidBodyComponent)
 
 	public:
 		enum struct RigidBodyType {
@@ -24,7 +24,7 @@ namespace scenegraph {
 		RigidBodyComponent(float Mass, RigidBodyType Type);
 		virtual ~RigidBodyComponent();
 
-		virtual void setActive(bool State);
+        virtual void setActive(bool State) override;
 
 		void setGroup(short Group);
 		short getGroup() const { return Group; }
@@ -82,7 +82,7 @@ namespace scenegraph {
 		friend class ConstraintComponent;
 
 	protected:
-		virtual void onNodeSet();
+        virtual void onNodeSet() override;
 	};
 
 }
