@@ -28,6 +28,9 @@ namespace scenegraph {
 		///! Returns the root node of the scene
 		Node * getRootNode() { return RootNode.get(); }
 
+        ///! Renders the scene
+        void render();
+
 		updateCallback::auto_remover_type addPreUpdateEvent(updateCallback::function_type && function);
 		updateCallback::auto_remover_type addPreUpdateEvent(const updateCallback::function_type & function);
 

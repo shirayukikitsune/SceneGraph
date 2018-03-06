@@ -92,6 +92,8 @@ namespace scenegraph {
 		componentChangedCallback::auto_remover_type addComponentRemovedEvent(componentChangedCallback::function_type && function);
 		componentChangedCallback::auto_remover_type addComponentRemovedEvent(const componentChangedCallback::function_type & function);
 
+		void render();
+
 	protected:
 		void invalidate();
 

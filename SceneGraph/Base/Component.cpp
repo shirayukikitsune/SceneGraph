@@ -24,10 +24,6 @@ bool Component::isActive() const
 	return true;
 }
 
-void Component::initialize()
-{
-}
-
 void Component::setNode(std::weak_ptr<sg::Node> Node)
 {
     this->ParentNode = Node;

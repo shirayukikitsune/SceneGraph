@@ -9,7 +9,7 @@
 #define KIT_SG_COMPONENT(t) \
 	public: \
 		constexpr static std::uint32_t componentNameHash = #t ## _crc32; \
-		virtual std::uint32_t getComponentNameHash() const { return componentNameHash; }
+        virtual std::uint32_t getComponentNameHash() const override { return componentNameHash; }
 
 namespace kitsune {
 namespace scenegraph {
@@ -18,7 +18,9 @@ namespace scenegraph {
 
 	class Component
 	{
-		KIT_SG_COMPONENT(kitsune::scenegraph::Component);
+    public:
+        constexpr static std::uint32_t componentNameHash = "kitsune::scenegraph::Component"_crc32;
+        virtual std::uint32_t getComponentNameHash() const { return componentNameHash; }
 
 	public:
 		typedef auto_callback<void(std::weak_ptr<Node>)> onNodeSetCallback;
@@ -30,7 +32,9 @@ namespace scenegraph {
 		bool isActive() const;
 		virtual void setActive(bool State) { Active = State; }
 
-		virtual void initialize();
+        virtual void initialize() {}
+
+        virtual void render() {}
 
 		void setNode(std::weak_ptr<Node> Node);
 		std::shared_ptr<Node> getNode();

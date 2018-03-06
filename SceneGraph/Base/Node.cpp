@@ -175,6 +175,17 @@ Node::componentChangedCallback::auto_remover_type Node::addComponentRemovedEvent
 	return componentRemovedEvent.push_auto(function);
 }
 
+void Node::render()
+{
+    for (auto & Component : Components) {
+        Component.second->render();
+    }
+
+    for (auto & Child : ChildNodes) {
+        Child->render();
+    }
+}
+
 void Node::invalidate()
 {
 	if (RecalculateWorld)

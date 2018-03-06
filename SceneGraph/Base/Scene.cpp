@@ -32,6 +32,11 @@ void Scene::update(float DeltaTime)
 	updateEvents(DeltaTime);
 }
 
+void Scene::render()
+{
+    getRootNode()->render();
+}
+
 Scene::updateCallback::auto_remover_type Scene::addPreUpdateEvent(Scene::updateCallback::function_type && function)
 {
 	return preUpdateEvents.push_auto(function);
