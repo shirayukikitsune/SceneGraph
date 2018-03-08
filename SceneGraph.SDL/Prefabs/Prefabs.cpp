@@ -32,23 +32,23 @@ void CreatePlane(std::shared_ptr<Node> node, bool addPhysics) {
     // Create index buffer
     unsigned short planeIndices[] = { 0, 1, 2, 1, 3, 2 };
     typedef sdlg::ArrayBuffer<unsigned short, 1> IBType;
-    auto planeIndexBuffer = ::std::unique_ptr<IBType>(new IBType(sdlg::BufferTarget::Index));
+    auto planeIndexBuffer = std::unique_ptr<IBType>(new IBType(sdlg::BufferTarget::Index));
     planeIndexBuffer->create(planeIndices, sizeof(planeIndices) / sizeof(planeIndices[0]), sdlg::BufferFrequency::Static, sdlg::BufferAccess::Draw);
 
     // Create vertex buffer
     sdlg::vertex::PositionNormalUVVertex planeVertices[] = {
-        sdlg::vertex::PositionNormalUVVertex(btVector3(0, 0, 1), btVector3(0, 1, 0), btVector4(0, 1, 0, 0)),
-        sdlg::vertex::PositionNormalUVVertex(btVector3(1, 0, 1), btVector3(0, 1, 0), btVector4(1, 1, 0, 0)),
-        sdlg::vertex::PositionNormalUVVertex(btVector3(0, 0, 0), btVector3(0, 1, 0), btVector4(0, 0, 0, 0)),
-        sdlg::vertex::PositionNormalUVVertex(btVector3(1, 0, 0), btVector3(0, 1, 0), btVector4(1, 0, 0, 0))
+        sdlg::vertex::PositionNormalUVVertex(btVector3(1, -1, 0), btVector3(0, 1, 0), btVector4(0, 1, 0, 0)),
+        sdlg::vertex::PositionNormalUVVertex(btVector3(1, 1, 0), btVector3(0, 1, 0), btVector4(1, 1, 0, 0)),
+        sdlg::vertex::PositionNormalUVVertex(btVector3(-1, -1, 0), btVector3(0, 1, 0), btVector4(0, 0, 0, 0)),
+        sdlg::vertex::PositionNormalUVVertex(btVector3(-1, 1, 0), btVector3(0, 1, 0), btVector4(1, 0, 0, 0))
     };
     typedef sdlg::ArrayBuffer<sdlg::vertex::PositionNormalUVVertex, 1> VBType;
-    auto planeVertexBuffer = ::std::unique_ptr<VBType>(new VBType(sdlg::BufferTarget::Vertex));
+    auto planeVertexBuffer = std::unique_ptr<VBType>(new VBType(sdlg::BufferTarget::Vertex));
     planeVertexBuffer->create(planeVertices, sizeof(planeVertices) / sizeof(planeVertices[0]), sdlg::BufferFrequency::Static, sdlg::BufferAccess::Draw);
 
     Material->endSetup();
-    Material->setIndexBuffer(::std::move(planeIndexBuffer));
-    Material->setVertexBuffer(::std::move(planeVertexBuffer));
+    Material->setIndexBuffer(std::move(planeIndexBuffer));
+    Material->setVertexBuffer(std::move(planeVertexBuffer));
 }
 
 }
