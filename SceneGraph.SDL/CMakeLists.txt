@@ -4,6 +4,9 @@ set(HEADER_FILES
         Graphics.h
         Events/SDLEventHandler.h
         Graphics/Buffer.h
+        Graphics/Material.h
+        Graphics/Shader.h
+        Graphics/Vertex.h
         Prefabs/Prefabs.h
     )
 
@@ -16,7 +19,7 @@ add_library(scenegraph-sdl
         Prefabs/Prefabs.cpp
     )
 
-target_include_directories(scenegraph-sdl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../glad/include ${CMAKE_CURRENT_SOURCE_DIR}/../Scenegraph ${SDL2_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
+target_include_directories(scenegraph-sdl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../glad/include ${CMAKE_CURRENT_SOURCE_DIR}/../Scenegraph ${SDL2_INCLUDE_DIR} ${GLM_INCLUDE_DIR})
 target_link_libraries(scenegraph-sdl LINK_INTERFACE_LIBRARIES scenegraph glad ${SDL2_LIBRARY})
 
 set_target_properties( 

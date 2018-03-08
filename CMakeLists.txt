@@ -15,7 +15,6 @@ if (EnableTest)
 endif()
 # SDL 2 isn't required. If found, build SDL module
 find_package(SDL2)
-find_package(OpenGL)
 find_package(GLM)
 
 if (NOT Boost_FOUND)
