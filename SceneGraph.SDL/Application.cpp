@@ -15,6 +15,7 @@ Application::Application(kitsune::scenegraph::sdl::Bootstrap *Bootstrap)
 
 Application::~Application()
 {
+    SDL_Quit();
 }
 
 int Application::run()
@@ -77,6 +78,9 @@ int main(int argc, char ** argv)
     int retCode = App->run();
 
     AppBootstrap->onTerminating();
+
+    delete AppBootstrap;
+    delete App;
 
     return retCode;
 }
