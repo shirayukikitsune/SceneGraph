@@ -32,12 +32,7 @@ add_library(scenegraph
     )
 
 target_include_directories(scenegraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(scenegraph
-        LINK_INTERFACE_LIBRARIES ${BULLET_COLLISION_LIBRARY}
-        LINK_INTERFACE_LIBRARIES ${BULLET_DYNAMICS_LIBRARY}
-        LINK_INTERFACE_LIBRARIES ${BULLET_MATH_LIBRARY}
-        LINK_INTERFACE_LIBRARIES ${BULLET_SOFTBODY_LIBRARY}
-    )
+target_link_libraries(scenegraph LINK_INTERFACE_LIBRARIES ${BULLET_LIBRARIES})
 
 set_target_properties( 
   scenegraph

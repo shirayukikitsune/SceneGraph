@@ -30,7 +30,7 @@ namespace sdl {
 
     private:
         std::shared_ptr<Scene> CurrentScene;
-        Application *Application;
+        Application *_Application;
 
         bool Run;
 

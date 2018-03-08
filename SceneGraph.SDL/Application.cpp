@@ -8,9 +8,9 @@
 using kitsune::scenegraph::sdl::Application;
 
 Application::Application(kitsune::scenegraph::sdl::Bootstrap *Bootstrap)
-	: Bootstrap(Bootstrap), WindowTitle("Kitsune Scenegraph SDL Application")
+	: _Bootstrap(Bootstrap), WindowTitle("Kitsune Scenegraph SDL Application")
 {
-    Graphics = nullptr;
+    _Graphics = nullptr;
 }
 
 Application::~Application()
@@ -22,32 +22,32 @@ int Application::run()
 {
     Uint32 lastTick = SDL_GetTicks();
 
-    while (Bootstrap->shouldRun()) {
+    while (_Bootstrap->shouldRun()) {
         Uint32 currentTick = SDL_GetTicks();
         std::chrono::milliseconds frameTime(currentTick - lastTick);
         lastTick = currentTick;
 
         EventHandler.processEvents();
         
-        Bootstrap->onUpdate(frameTime);
+        _Bootstrap->onUpdate(frameTime);
         
-        Graphics->clear();
+        _Graphics->clear();
 
-        Bootstrap->onRender();
+        _Bootstrap->onRender();
 
-        Graphics->present();
+        _Graphics->present();
     }
 
-    return Bootstrap->returnCode();
+    return _Bootstrap->returnCode();
 }
 
 void Application::setWindowTitle(const char *Title)
 {
-    if (this->Graphics) {
-        this->Graphics->setWindowTitle(Title);
+    if (_Graphics) {
+        _Graphics->setWindowTitle(Title);
     }
 
-    this->WindowTitle = Title;
+    WindowTitle = Title;
 }
 
 void Application::createGraphics()
@@ -55,10 +55,10 @@ void Application::createGraphics()
     SDL_Init(SDL_INIT_EVERYTHING);
 
     int width, height;
-    this->Bootstrap->getWindowDimensions(width, height);
+    _Bootstrap->getWindowDimensions(width, height);
 
-    this->Graphics = new kitsune::scenegraph::sdl::Graphics(width, height);
-    this->Graphics->setWindowTitle(this->WindowTitle.c_str());
+    _Graphics = new kitsune::scenegraph::sdl::Graphics(width, height);
+    _Graphics->setWindowTitle(this->WindowTitle.c_str());
 }
 
 int main(int argc, char ** argv)

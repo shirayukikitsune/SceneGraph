@@ -32,26 +32,26 @@ ExampleApplication::ExampleApplication()
 
 void ExampleApplication::onInitializing(sg::sdl::Application * Application)
 {
-    this->Application = Application;
-    Application->setWindowTitle("Scenegraph Example 02 - Basic Transform");
+    _Application = Application;
+    _Application->setWindowTitle("Scenegraph Example 02 - Basic Transform");
 }
 
 void ExampleApplication::onInitialized()
 {
-    Application->getGraphics()->setClearColor(1.0f, 0, 0, 0);
-    Application->getGraphics()->setVerticalSync(true);
+    _Application->getGraphics()->setClearColor(1.0f, 0, 0, 0);
+    _Application->getGraphics()->setVerticalSync(true);
 
     // All of these will make the application gracefully end:
     //  - Send a SIGTERM
     //  - Close the main window
     //  - Press the ESCAPE key
-    Application->getEventHandler()->addHandler(sg::events::application::Quit, [this](void*) {
+    _Application->getEventHandler()->addHandler(sg::events::application::Quit, [this](void*) {
         this->Run = false;
     });
-    Application->getEventHandler()->addHandler(sg::events::window::Close, [this](void*) {
+    _Application->getEventHandler()->addHandler(sg::events::window::Close, [this](void*) {
         this->Run = false;
     });
-    Application->getEventHandler()->addHandler(sg::events::input::KeyUp, [this](void* data) {
+    _Application->getEventHandler()->addHandler(sg::events::input::KeyUp, [this](void* data) {
         SDL_KeyboardEvent *evData = reinterpret_cast<SDL_KeyboardEvent*>(data);
         if (evData->keysym.sym == SDLK_ESCAPE) {
             this->Run = false;
@@ -121,7 +121,7 @@ void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
         a = sg::util::Easing<sg::util::EasingFunction::CubicOut>()((1000 - f) / 500.0f);
     }
 
-    Application->getGraphics()->setClearColor(1.0f, a, a, a);
+    _Application->getGraphics()->setClearColor(1.0f, a, a, a);
 
     CurrentScene->update(frameTime.count());
 }

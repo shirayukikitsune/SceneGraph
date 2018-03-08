@@ -9,7 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(EnableTest "Enable unit testing" ON)
 
-find_package(Bullet REQUIRED)
+find_package(Bullet3 REQUIRED)
 if (EnableTest)
     # Check for boost test, but it is not required
     find_package(Boost 1.59 COMPONENTS unit_test_framework)

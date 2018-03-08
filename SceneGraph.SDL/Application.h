@@ -22,13 +22,13 @@ namespace sdl {
         int run();
         
         void createGraphics();
-        Graphics* getGraphics() { return Graphics; }
+        Graphics* getGraphics() { return _Graphics; }
 
         kitsune::scenegraph::events::EventHandler * getEventHandler() { return &EventHandler; }
 
 	protected:
-        Bootstrap *Bootstrap;
-        Graphics *Graphics;
+        Bootstrap *_Bootstrap;
+        Graphics *_Graphics;
 
         events::SDLEventHandler EventHandler;
 
