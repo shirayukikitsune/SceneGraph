@@ -33,7 +33,7 @@ ExampleApplication::ExampleApplication()
 void ExampleApplication::onInitializing(sg::sdl::Application * Application)
 {
     this->Application = Application;
-    Application->setWindowTitle("Scenegraph Example 01 - Bootstrap");
+    Application->setWindowTitle("Scenegraph Example 02 - Basic Transform");
 }
 
 void ExampleApplication::onInitialized()
@@ -63,14 +63,15 @@ void ExampleApplication::onInitialized()
 
     Scene->initialize();
 
-    // Add a plane to the scene
+    // Add a cube to the scene
     auto Node = Scene->getRootNode()->addChildNode();
-    Node->setName("Plane");
-    sg::sdl::prefabs::CreatePlane(Node, false);
+    Node->setName("Cube");
+    Node->setTag("Cube");
+    sg::sdl::prefabs::CreateCube(Node, false);
 
     auto Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
-    Shader->append("example01.vert", sdlg::ShaderType::Vertex);
-    Shader->append("example01.frag", sdlg::ShaderType::Fragment);
+    Shader->append("example02.vert", sdlg::ShaderType::Vertex);
+    Shader->append("example02.frag", sdlg::ShaderType::Fragment);
     Shader->linkShaders();
 
     CurrentScene = Scene;
@@ -86,6 +87,20 @@ void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
     currentTime += frameTime.count();
     int f = (int)currentTime % 2000;
     float a = 0.0f;
+
+    // We rotate the cube a bit every frame
+    auto Nodes = CurrentScene->findNodesByTag("Cube");
+    for (auto i = Nodes.first; i != Nodes.second; ++i) {
+        if (auto Node = i->second.lock()) {
+            btQuaternion rotation = Node->getLocalRotation();
+            float X, Y, Z;
+            rotation.getEulerZYX(Z, Y, X);
+            Z = -SIMD_PI / 18.0f;
+            Y += 0.03f;
+            rotation.setEuler(Y, X, Z);
+            Node->setLocalRotation(rotation);
+        }
+    }
 
     if (f < 500) {
         a = sg::util::Easing<sg::util::EasingFunction::CubicIn>()(f / 500.0f);

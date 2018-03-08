@@ -18,6 +18,11 @@ namespace prefabs {
  */
 void CreatePlane(std::shared_ptr<Node> node, bool addPhysics = true);
 
+/**
+ * This function will create a cube on the specified Node, having each edge with unitary length
+ */
+void CreateCube(std::shared_ptr<Node> node, bool addPhysics = true);
+
 }
 }
 }
