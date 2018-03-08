@@ -1,6 +1,7 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE kitsune::scenegraph::Node
 #include <boost/test/unit_test.hpp>
+#include <memory>
 
 #include "Base/Component.h"
 #include "Base/Node.h"
@@ -124,6 +125,30 @@ BOOST_AUTO_TEST_CASE(NodeScene)
 
 	BOOST_TEST((Child->getScene() == nullptr), "Unexpected scene for child");
 	BOOST_TEST((Child->getParentNode() != nullptr), "Expected parent node");
+}
+
+BOOST_AUTO_TEST_CASE(NodeName)
+{
+	std::shared_ptr<sg::Node> Node(new sg::Node(std::weak_ptr<sg::Scene>()));
+
+	Node->setName("Test Node");
+
+	BOOST_TEST((Node->getName().compare("Test Node") == 0), "Unexpected name");
+}
+
+BOOST_AUTO_TEST_CASE(NodeTag)
+{
+	auto Scene = makeScene();
+	auto RootNode = Scene->getRootNode()->shared_from_this();
+
+	RootNode->setTag("test");
+
+	BOOST_TEST((RootNode->getTag().compare("test") == 0), "Unexpected tag");
+
+	auto range = Scene->findNodesByTag("test");
+	BOOST_TEST((range.first != range.second), "Invalid range");
+	auto nodeRef = range.first->second;
+	BOOST_TEST((!(RootNode<nodeRef.lock()) && !(nodeRef.lock()<RootNode)), "Invalid reference");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

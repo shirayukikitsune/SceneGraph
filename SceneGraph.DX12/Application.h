@@ -6,11 +6,18 @@ namespace kitsune {
 namespace scenegraph {
 namespace dx12 {
 
+    class Device;
+
 	class Application
 	{
-	public:
+    private:
 		Application(Bootstrap *Bootstrap);
 		~Application();
+        static Application* Instance;
+
+    public:
+        static Application* prepareInstance();
+        static Application* getInstance();
 
 		void setWindowDimentions(LONG Width, LONG Height);
 
@@ -18,8 +25,11 @@ namespace dx12 {
 		void setWindowTitle(LPCTSTR Title);
 
 		void createWindow(HINSTANCE hInstance, int ShowCommand);
+        void createRenderer();
 
 		int run();
+
+        Device * getDevice() { return RenderDevice; }
 
 	protected:
 		HWND MainWindow;
@@ -27,6 +37,7 @@ namespace dx12 {
 		LONG WindowHeight;
 		LPTSTR WindowTitle;
 		Bootstrap *Bootstrap;
+        Device *RenderDevice;
 
 		static LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM wParam, LPARAM lParam);
 	};

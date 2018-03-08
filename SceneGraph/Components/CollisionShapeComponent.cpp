@@ -15,7 +15,7 @@ using kitsune::scenegraph::CollisionShapeComponent;
 namespace sg = kitsune::scenegraph;
 
 CollisionShapeComponent::CollisionShapeComponent()
-	: PlaneConstant(0.0f)
+    : PlaneConstant(0.0f), Dimentions(btVector3(0, 0, 0))
 {
 	CollisionShape.reset(new btEmptyShape);
 }

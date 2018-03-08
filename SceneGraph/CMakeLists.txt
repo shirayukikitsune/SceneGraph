@@ -10,9 +10,14 @@ set(HEADER_FILES
         Components/ConstraintComponent.h
         Components/RigidBodyComponent.h
         Components/SceneEventComponent.h
+        Events/EventHandler.h
+        Events/EventType.h
+        Util/Easing.h
+        Util/Util.h
     )
 
 add_library(scenegraph
+        ${HEADER_FILES}
         Base/Component.cpp
         Base/Node.cpp
         Base/PhysicsScene.cpp
@@ -21,14 +26,17 @@ add_library(scenegraph
         Components/ConstraintComponent.cpp
         Components/RigidBodyComponent.cpp
         Components/SceneEventComponent.cpp
+        Events/EventHandler.cpp
+        Util/Easing.cpp
+        Util/Util.cpp
     )
 
 target_include_directories(scenegraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(scenegraph
-        INTERFACE ${BULLET_COLLISION_LIBRARY}
-        INTERFACE ${BULLET_DYNAMICS_LIBRARY}
-        INTERFACE ${BULLET_MATH_LIBRARY}
-        INTERFACE ${BULLET_SOFTBODY_LIBRARY}
+        LINK_INTERFACE_LIBRARIES ${BULLET_COLLISION_LIBRARY}
+        LINK_INTERFACE_LIBRARIES ${BULLET_DYNAMICS_LIBRARY}
+        LINK_INTERFACE_LIBRARIES ${BULLET_MATH_LIBRARY}
+        LINK_INTERFACE_LIBRARIES ${BULLET_SOFTBODY_LIBRARY}
     )
 
 set_target_properties( 
@@ -43,6 +51,7 @@ PROPERTIES
 )   
 
 install(TARGETS scenegraph
+        FRAMEWORK DESTINATION lib
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib)
 

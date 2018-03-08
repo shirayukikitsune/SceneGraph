@@ -20,7 +20,7 @@ void SceneEventComponent::registerEvents()
 		ScenePreUpdate = Scene->addPreUpdateEvent(std::bind(&SceneEventComponent::onPreUpdate, this, std::placeholders::_1));
 	}
 
-	if (Events & (uint32_t)AttachedEvents::Update) {
-		SceneUpdate = Scene->addUpdateEvent(std::bind(&SceneEventComponent::onUpdate, this, std::placeholders::_1));
+    if (Events & (uint32_t)AttachedEvents::PostUpdate) {
+        SceneUpdate = Scene->addUpdateEvent(std::bind(&SceneEventComponent::onPostUpdate, this, std::placeholders::_1));
 	}
 }

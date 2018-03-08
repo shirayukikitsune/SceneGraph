@@ -1,7 +1,7 @@
 #pragma once
 
 // From SceneGraph.DX12
-#include <Application.h>
+#include <Bootstrap.h>
 // From SceneGraph
 #include <Base/Scene.h>
 
@@ -17,8 +17,7 @@ namespace dx12 {
 		 * This function is called before the main application is started.
 		 * Here you can initialize settings, set window parameters
 		 */
-		void onInitializing(Application * app);
-		void setWindowClass(WNDCLASSEX &WndClass);
+		void onInitializing();
 		void onInitialized();
 		void onTerminating();
 		void onUpdate();

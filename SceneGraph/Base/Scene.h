@@ -3,6 +3,8 @@
 #include "Callback.h"
 
 #include <memory>
+#include <map>
+#include <string>
 
 namespace kitsune {
 namespace scenegraph {
@@ -28,11 +30,21 @@ namespace scenegraph {
 		///! Returns the root node of the scene
 		Node * getRootNode() { return RootNode.get(); }
 
+        ///! Renders the scene
+        void render();
+
 		updateCallback::auto_remover_type addPreUpdateEvent(updateCallback::function_type && function);
 		updateCallback::auto_remover_type addPreUpdateEvent(const updateCallback::function_type & function);
 
 		updateCallback::auto_remover_type addUpdateEvent(updateCallback::function_type && function);
 		updateCallback::auto_remover_type addUpdateEvent(const updateCallback::function_type & function);
+
+		void addTaggedNode(const std::string & Tag, std::shared_ptr<Node> Node);
+		void removeTaggedNode(const std::string & Tag, std::shared_ptr<Node> Node);
+
+		auto findNodesByTag(const std::string & Tag) {
+			return this->TaggedNodes.equal_range(Tag);
+		}
 
 	protected:
 		///! Event called right when the scene is asked to initialize.
@@ -58,6 +70,9 @@ namespace scenegraph {
 		///
 		/// \remarks This pointer is guaranteed to be valid (i.e., RootNode != nullptr) while the instance of this scene remains valid
 		std::shared_ptr<Node> RootNode;
+
+		///! Nodes with tags
+		std::multimap<std::string, std::weak_ptr<Node>> TaggedNodes;
 	};
 
 }

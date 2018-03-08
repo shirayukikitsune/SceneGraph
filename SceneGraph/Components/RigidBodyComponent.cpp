@@ -2,6 +2,7 @@
 
 #include "CollisionShapeComponent.h"
 #include "../Base/PhysicsScene.h"
+#include "../Util/Util.h"
 
 #include <BulletCollision/CollisionShapes/btEmptyShape.h>
 
@@ -136,13 +137,13 @@ void RigidBodyComponent::setRigidBodyType(RigidBodyType Type)
 
 	switch (Type) {
 	case RigidBodyType::Static:
-		flags = flags & ~btCollisionObject::CF_KINEMATIC_OBJECT | btCollisionObject::CF_STATIC_OBJECT;
+        flags = util::addFlag(util::removeFlag(flags, btCollisionObject::CF_KINEMATIC_OBJECT), btCollisionObject::CF_STATIC_OBJECT);
 		break;
 	case RigidBodyType::Kinematic:
-		flags = flags | btCollisionObject::CF_KINEMATIC_OBJECT & ~btCollisionObject::CF_STATIC_OBJECT;
+        flags = util::removeFlag(util::addFlag(flags, btCollisionObject::CF_KINEMATIC_OBJECT), btCollisionObject::CF_STATIC_OBJECT);
 		break;
 	case RigidBodyType::Dynamic:
-		flags = flags & ~btCollisionObject::CF_KINEMATIC_OBJECT & ~btCollisionObject::CF_STATIC_OBJECT;
+        flags = util::removeFlag(flags, btCollisionObject::CF_KINEMATIC_OBJECT | btCollisionObject::CF_STATIC_OBJECT);
 		break;
 	}
 

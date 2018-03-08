@@ -1,6 +1,7 @@
 #include "Node.h"
 
 #include "Component.h"
+#include "Scene.h"
 
 using kitsune::scenegraph::Node;
 namespace sg = kitsune::scenegraph;
@@ -145,6 +146,48 @@ void Node::resetTransform()
 	invalidate();
 }
 
+void Node::setTag(const std::string & tag)
+{
+	// Delete old Tag from scene
+	auto scene = getScene();
+
+	if (!Tag.empty()) {
+		if (scene) {
+			scene->removeTaggedNode(Tag, shared_from_this());
+		}
+	}
+
+	Tag = tag;
+
+	if (!Tag.empty()) {
+		// Insert new tag to scene
+		if (scene) {
+			scene->addTaggedNode(Tag, shared_from_this());
+		}
+	}
+}
+
+void Node::setTag(std::string && tag)
+{
+	// Delete old Tag from scene
+	auto scene = getScene();
+
+	if (!Tag.empty()) {
+		if (scene) {
+			scene->removeTaggedNode(Tag, shared_from_this());
+		}
+	}
+
+	Tag = std::move(tag);
+
+	if (!Tag.empty()) {
+		// Insert new tag to scene
+		if (scene) {
+			scene->addTaggedNode(Tag, shared_from_this());
+		}
+	}
+}
+
 Node::invalidatedByParentCallback::auto_remover_type Node::addInvalidatedByParentEvent(invalidatedByParentCallback::function_type && function)
 {
 	return invalidatedByParentEvent.push_auto(function);
@@ -173,6 +216,17 @@ Node::componentChangedCallback::auto_remover_type Node::addComponentRemovedEvent
 Node::componentChangedCallback::auto_remover_type Node::addComponentRemovedEvent(const componentChangedCallback::function_type & function)
 {
 	return componentRemovedEvent.push_auto(function);
+}
+
+void Node::render()
+{
+    for (auto & Component : Components) {
+        Component.second->render();
+    }
+
+    for (auto & Child : ChildNodes) {
+        Child->render();
+    }
 }
 
 void Node::invalidate()

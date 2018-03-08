@@ -1,16 +1,35 @@
 #include "Application.h"
+#include "Device.h"
 
 #include <cassert>
 
 using kitsune::scenegraph::dx12::Application;
 
+Application* Application::Instance;
+
 Application::Application(kitsune::scenegraph::dx12::Bootstrap *Bootstrap)
 	: Bootstrap(Bootstrap)
 {
+    setWindowTitle(TEXT("Kitsune SceneGraph"));
 }
 
 Application::~Application()
 {
+}
+
+Application* Application::prepareInstance()
+{
+    if (Instance)
+        return Instance;
+
+    Instance = new Application(AppBootstrap);
+
+    return Instance;
+}
+
+Application* Application::getInstance()
+{
+    return Instance;
 }
 
 void Application::setWindowDimentions(LONG Width, LONG Height)
@@ -28,6 +47,11 @@ void Application::setWindowTitle(LPCTSTR Title)
 	WindowTitle = (LPTSTR)new LPTCH[Size + 1];
 	lstrcpy(WindowTitle, Title);
 	WindowTitle[Size] = TEXT('\0');
+
+    if (IsWindow(MainWindow))
+    {
+        SetWindowText(MainWindow, WindowTitle);
+    }
 }
 
 void Application::createWindow(HINSTANCE hInstance, int ShowCommand)
@@ -60,6 +84,12 @@ void Application::createWindow(HINSTANCE hInstance, int ShowCommand)
 		NULL);
 
 	ShowWindow(MainWindow, ShowCommand);
+}
+
+void Application::createRenderer()
+{
+    Device * RenderDevice = AppBootstrap->createDevice();
+    RenderDevice->createAdapter();
 }
 
 int Application::run()
@@ -95,15 +125,16 @@ LRESULT CALLBACK Application::WindowProc(HWND Window, UINT Message, WPARAM wPara
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
-	using kitsune::scenegraph::dx12::AppBootstrap;
+	using namespace kitsune::scenegraph::dx12;
 
 	assert(AppBootstrap != nullptr && "AppBootstrap is not set");
 
-	Application * App = new Application(AppBootstrap);
+    Application * App = Application::prepareInstance();
 
-	AppBootstrap->onInitializing(App);
+	AppBootstrap->onInitializing();
 
 	App->createWindow(hInstance, nCmdShow);
+    App->createRenderer();
 
 	AppBootstrap->onInitialized();
 

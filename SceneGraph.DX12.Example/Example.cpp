@@ -1,5 +1,8 @@
 #include "Example.h"
 
+// From SceneGraph.DX12
+#include <Application.h>
+
 #include <future>
 #include <deque>
 #include <vector>
@@ -8,14 +11,12 @@ using kitsune::scenegraph::dx12::ExampleApplication;
 
 kitsune::scenegraph::dx12::Bootstrap * kitsune::scenegraph::dx12::AppBootstrap = new ExampleApplication;
 
-void ExampleApplication::onInitializing(kitsune::scenegraph::dx12::Application * app)
+void ExampleApplication::onInitializing()
 {
-	app->setWindowTitle(TEXT("Kitsune SceneGraph DirectX12 Sample Application"));
-	app->setWindowDimentions(1280, 768);
-}
+    auto App = kitsune::scenegraph::dx12::Application::getInstance();
 
-void ExampleApplication::setWindowClass(WNDCLASSEX & WndClass)
-{
+    App->setWindowTitle(TEXT("Kitsune SceneGraph DirectX12 Sample Application"));
+	App->setWindowDimentions(1280, 768);
 }
 
 void ExampleApplication::onInitialized()

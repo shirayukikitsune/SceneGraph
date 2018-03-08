@@ -11,20 +11,22 @@ namespace scenegraph {
 	class SceneEventComponent :
 		public Component
 	{
-		KIT_SG_COMPONENT(kitsune::scenegraph::SceneEventComponent);
+        KIT_SG_COMPONENT(kitsune::scenegraph::SceneEventComponent)
 
 	public:
 		enum class AttachedEvents {
 			None,
 			PreUpdate,
-			Update
+            PostUpdate,
+            PrePhysics,
+            PostPhysics
 		};
 
 		SceneEventComponent();
 		virtual ~SceneEventComponent();
 
 		virtual void onPreUpdate(float DeltaTime) {}
-		virtual void onUpdate(float DeltaTime) {}
+        virtual void onPostUpdate(float DeltaTime) {}
 
 		void registerEvents();
 

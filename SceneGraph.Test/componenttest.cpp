@@ -29,19 +29,19 @@ public:
 
 	int updated;
 
-	virtual void onPreUpdate(float DeltaTime) {
+	virtual void onPreUpdate(float DeltaTime) override {
 		updated = 1;
 
 		sg::SceneEventComponent::onPreUpdate(DeltaTime);
 	}
 
-	virtual void onUpdate(float DeltaTime) {
+	virtual void onPostUpdate(float DeltaTime) override {
 		updated = 2;
 
-		sg::SceneEventComponent::onUpdate(DeltaTime);
+		sg::SceneEventComponent::onPostUpdate(DeltaTime);
 	}
 
-	virtual uint32_t getAttachedEvents() { return (uint32_t)AttachedEvents::PreUpdate | (uint32_t)AttachedEvents::Update; }
+	virtual uint32_t getAttachedEvents() override { return (uint32_t)AttachedEvents::PreUpdate | (uint32_t)AttachedEvents::PostUpdate; }
 };
 
 BOOST_AUTO_TEST_SUITE(Component)
