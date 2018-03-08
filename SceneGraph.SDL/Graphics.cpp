@@ -21,7 +21,7 @@ Graphics::Graphics(int Width, int Height)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
-    this->Window = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
+    this->Window = SDL_CreateWindow("", 0, 0, Width, Height, SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
     if (!Window) {
         throw Graphics::Exception(SDL_GetError());
     }
