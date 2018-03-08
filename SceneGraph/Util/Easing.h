@@ -2,18 +2,13 @@
 
 #include <cmath>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-#ifndef M_PI_2
-#define M_PI_2 1.57079632679489661923
-#endif
-
 // From https://github.com/warrenm/AHEasing/blob/master/AHEasing/easing.c
 
 namespace kitsune {
 namespace scenegraph {
 namespace util {
+    const float PI = 3.14159265f;
+    const float PI_2 = 1.57079633f;
 
     enum struct EasingFunction
     {
@@ -174,7 +169,7 @@ namespace util {
                 return 4.0f * p * p * p;
             } else {
                 float f = ((2.0f * p) - 2.0f);
-                return 0.5 * f * f * f + 1.0f;
+                return 0.5f * f * f * f + 1.0f;
             }
         }
     };
@@ -251,7 +246,7 @@ namespace util {
     public:
         float operator()(float p) const
         {
-            return sinf((p - 1.0f) * M_PI_2) + 1.0f;
+            return sinf((p - 1.0f) * PI_2) + 1.0f;
         }
     };
 
@@ -261,7 +256,7 @@ namespace util {
     public:
         float operator()(float p) const
         {
-            return sinf(p * M_PI_2);
+            return sinf(p * PI_2);
         }
     };
 
@@ -271,7 +266,7 @@ namespace util {
     public:
         float operator()(float p) const
         {
-            return 0.5f * (1.0f - cosf(p * M_PI));
+            return 0.5f * (1.0f - cosf(p * PI));
         }
     };
 
@@ -359,7 +354,7 @@ namespace util {
     public:
         float operator()(float p) const
         {
-            return sinf(13.0f * M_PI_2 * p) * powf(2.0f, 10.0f * (p - 1.0f));
+            return sinf(13.0f * PI_2 * p) * powf(2.0f, 10.0f * (p - 1.0f));
         }
     };
 
@@ -369,7 +364,7 @@ namespace util {
     public:
         float operator()(float p) const
         {
-            return sinf(-13.0f * M_PI_2 * (p + 1.0f)) * powf(2.0f, -10.0f * p) + 1.0f;
+            return sinf(-13.0f * PI_2 * (p + 1.0f)) * powf(2.0f, -10.0f * p) + 1.0f;
         }
     };
 
@@ -381,11 +376,11 @@ namespace util {
         {
             if (p < 0.5f)
             {
-                return 0.5f * sinf(13.0f * M_PI_2 * (2.0f * p)) * powf(2.0f, 10.0f * ((2.0f * p) - 1.0f));
+                return 0.5f * sinf(13.0f * PI_2 * (2.0f * p)) * powf(2.0f, 10.0f * ((2.0f * p) - 1.0f));
             }
             else
             {
-                return 0.5f * (sinf(-13.0f * M_PI_2 * ((2.0f * p - 1.0f) + 1.0f)) * powf(2.0f, -10.0f * (2.0f * p - 1.0f)) + 2.0f);
+                return 0.5f * (sinf(-13.0f * PI_2 * ((2.0f * p - 1.0f) + 1.0f)) * powf(2.0f, -10.0f * (2.0f * p - 1.0f)) + 2.0f);
             }
         }
     };
@@ -396,7 +391,7 @@ namespace util {
     public:
         float operator()(float p) const
         {
-            return p * p * p - p * sinf(p * M_PI);
+            return p * p * p - p * sinf(p * PI);
         }
     };
 
@@ -407,7 +402,7 @@ namespace util {
         float operator()(float p) const
         {
             float f = 1.0f - p;
-            return 1.0f - (f * f * f - f * sinf(f * M_PI));
+            return 1.0f - (f * f * f - f * sinf(f * PI));
         }
     };
 
@@ -420,12 +415,12 @@ namespace util {
             if (p < 0.5f)
             {
                 float f = 2.0f * p;
-                return 0.5f * (f * f * f - f * sinf(f * M_PI));
+                return 0.5f * (f * f * f - f * sinf(f * PI));
             }
             else
             {
                 float f = 1.0f - (2.0f * p - 1);
-                return 0.5f * (1.0f - (f * f * f - f * sinf(f * M_PI))) + 0.5f;
+                return 0.5f * (1.0f - (f * f * f - f * sinf(f * PI))) + 0.5f;
             }
         }
     };
