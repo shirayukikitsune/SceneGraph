@@ -24,7 +24,12 @@ add_library(scenegraph
     )
 
 target_include_directories(scenegraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(scenegraph INTERFACE ${BULLET_COLLISION_LIBRARY} ${BULLET_DYNAMICS_LIBRARY} ${BULLET_MATH_LIBRARY} ${BULLET_SOFTBODY_LIBRARY})
+target_link_libraries(scenegraph
+        INTERFACE ${BULLET_COLLISION_LIBRARY}
+        INTERFACE ${BULLET_DYNAMICS_LIBRARY}
+        INTERFACE ${BULLET_MATH_LIBRARY}
+        INTERFACE ${BULLET_SOFTBODY_LIBRARY}
+    )
 
 set_target_properties( 
   scenegraph
@@ -41,13 +46,5 @@ install(TARGETS scenegraph
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib)
 
-MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST)
-
-    FOREACH(HEADER ${${HEADER_LIST}})
-        STRING(REGEX MATCH "(.*)[/\\]" DIR ${HEADER})
-        INSTALL(FILES ${HEADER} DESTINATION include/kitsune/scenegraph/${DIR})
-    ENDFOREACH(HEADER)
-
-ENDMACRO(INSTALL_HEADERS_WITH_DIRECTORY)
-
-INSTALL_HEADERS_WITH_DIRECTORY(HEADER_FILES)
+install(DIRECTORY . DESTINATION include/kitsune/scenegraph
+        FILES_MATCHING PATTERN "*.h")
