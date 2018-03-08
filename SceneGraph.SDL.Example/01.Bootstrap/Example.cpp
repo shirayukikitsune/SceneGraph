@@ -6,9 +6,15 @@
 #include <Components/RigidBodyComponent.h>
 #include <Util/Easing.h>
 
+#include <Graphics/Buffer.h>
+#include <Graphics/Material.h>
+#include <Graphics/Shader.h>
+#include <Prefabs/Prefabs.h>
+
 using kitsune::scenegraph::sdl::Application;
 using kitsune::scenegraph::sdl::ExampleApplication;
 namespace sg = kitsune::scenegraph;
+namespace sdlg = kitsune::scenegraph::sdl::graphics;
 
 namespace kitsune {
 namespace scenegraph {
@@ -17,7 +23,6 @@ kitsune::scenegraph::sdl::Bootstrap * AppBootstrap = new ExampleApplication;
 }
 }
 }
-
 
 ExampleApplication::ExampleApplication()
 {
@@ -36,13 +41,16 @@ void ExampleApplication::onInitialized()
     Application->getGraphics()->setClearColor(1.0f, 0, 0, 0);
     Application->getGraphics()->setVerticalSync(true);
 
+    // All of these will make the application gracefully end:
+    //  - Send a SIGTERM
+    //  - Close the main window
+    //  - Press the ESCAPE key
     Application->getEventHandler()->addHandler(sg::events::application::Quit, [this](void*) {
         this->Run = false;
     });
     Application->getEventHandler()->addHandler(sg::events::window::Close, [this](void*) {
         this->Run = false;
     });
-
     Application->getEventHandler()->addHandler(sg::events::input::KeyUp, [this](void* data) {
         SDL_KeyboardEvent *evData = reinterpret_cast<SDL_KeyboardEvent*>(data);
         if (evData->keysym.sym == SDLK_ESCAPE) {
@@ -50,30 +58,32 @@ void ExampleApplication::onInitialized()
         }
     });
 
+    // Setup the basic scene, with physics support
     std::shared_ptr<sg::PhysicsScene> Scene(new sg::PhysicsScene);
 
 	Scene->setGravity(btVector3(0, -10.0f, 0));
 	Scene->setFps(60.0f);
-
     Scene->initialize();
 
+    // Add a plane to the scene
     auto Node = Scene->getRootNode()->addChildNode();
     Node->setName("Plane");
+    sg::sdl::prefabs::CreatePlane(Node);
 
-    auto CollisionShape = Node->createComponent<sg::CollisionShapeComponent>();
-    CollisionShape->setDimentions(btVector3(0, 1, 0));
-    CollisionShape->setShape(sg::CollisionShapeComponent::ShapeFormat::Plane);
-    
-    auto RigidBody = Node->createComponent<sg::RigidBodyComponent>(0, sg::RigidBodyComponent::RigidBodyType::Static);
+    auto Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
+    Shader->append("example01.vert", sdlg::ShaderType::Vertex);
+    Shader->append("example01.frag", sdlg::ShaderType::Fragment);
+    Shader->linkShaders();
 
+    // Now add a box
     Node = Scene->getRootNode()->addChildNode();
     Node->setLocalOffset(btVector3(0, 5.0f, 0));
 
-    CollisionShape = Node->createComponent<sg::CollisionShapeComponent>();
+    auto CollisionShape = Node->createComponent<sg::CollisionShapeComponent>();
     CollisionShape->setDimentions(btVector3(1, 1, 1));
     CollisionShape->setShape(sg::CollisionShapeComponent::ShapeFormat::Box);
 
-    RigidBody = Node->createComponent<sg::RigidBodyComponent>(1.0f, sg::RigidBodyComponent::RigidBodyType::Dynamic);
+    auto RigidBody = Node->createComponent<sg::RigidBodyComponent>(1.0f, sg::RigidBodyComponent::RigidBodyType::Dynamic);
     RigidBody->setRestitution(0.5f);
 
     CurrentScene = Scene;
