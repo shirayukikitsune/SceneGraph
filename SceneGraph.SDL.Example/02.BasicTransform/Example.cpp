@@ -67,6 +67,16 @@ void ExampleApplication::onInitialized()
     auto Node = Scene->getRootNode()->addChildNode();
     Node->setName("Cube");
     Node->setTag("Cube");
+    // Scale the cube by 2.0
+    auto transform = Node->getLocalTransform();
+    transform.setBasis(transform.getBasis().scaled(btVector3(2.0f, 2.0f, 2.0f)));
+    Node->setLocalTransform(transform);
+    sg::sdl::prefabs::CreateCube(Node, false);
+
+    // Add a new cube as a child of the first cube
+    Node = Node->addChildNode();
+    Node->setName("Cube 2");
+    Node->setTag("Cube");
     sg::sdl::prefabs::CreateCube(Node, false);
 
     auto Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
@@ -88,19 +98,22 @@ void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
     int f = (int)currentTime % 2000;
     float a = 0.0f;
 
-    // We rotate the cube a bit every frame
+    // We rotate the cubes a bit every frame
     auto Nodes = CurrentScene->findNodesByTag("Cube");
     for (auto i = Nodes.first; i != Nodes.second; ++i) {
         if (auto Node = i->second.lock()) {
+            auto step = Node->getName().compare("Cube") == 0 ? 0.03f : 0.015f;
             btQuaternion rotation = Node->getLocalRotation();
             float X, Y, Z;
             rotation.getEulerZYX(Z, Y, X);
             Z = -SIMD_PI / 18.0f;
-            Y += 0.03f;
+            Y += step;
             rotation.setEuler(Y, X, Z);
             Node->setLocalRotation(rotation);
         }
     }
+
+    // With the first cube local rotation, the second cube will orbit around the first while also rotating itself
 
     if (f < 500) {
         a = sg::util::Easing<sg::util::EasingFunction::CubicIn>()(f / 500.0f);
