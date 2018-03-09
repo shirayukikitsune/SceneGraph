@@ -2,6 +2,7 @@ set(HEADER_FILES
         Application.h
         Bootstrap.h
         Graphics.h
+        Components/CameraComponent.h
         Events/SDLEventHandler.h
         Graphics/Buffer.h
         Graphics/Material.h
@@ -14,6 +15,7 @@ add_library(scenegraph-sdl
         ${HEADER_FILES}
         Application.cpp
         Graphics.cpp
+        Components/CameraComponent.cpp
         Events/SDLEventHandler.cpp
         Graphics/Buffer.cpp
         Prefabs/Prefabs.cpp

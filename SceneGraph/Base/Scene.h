@@ -30,6 +30,9 @@ namespace scenegraph {
 		///! Returns the root node of the scene
 		Node * getRootNode() { return RootNode.get(); }
 
+		std::shared_ptr<Node> getActiveCamera() { return ActiveCamera.lock(); }
+		void setActiveCamera(std::shared_ptr<Node> &Camera) { ActiveCamera = Camera; }
+
         ///! Renders the scene
         void render();
 
@@ -70,6 +73,9 @@ namespace scenegraph {
 		///
 		/// \remarks This pointer is guaranteed to be valid (i.e., RootNode != nullptr) while the instance of this scene remains valid
 		std::shared_ptr<Node> RootNode;
+
+		///! A node that is set as current camera
+		std::weak_ptr<Node> ActiveCamera;
 
 		///! Nodes with tags
 		std::multimap<std::string, std::weak_ptr<Node>> TaggedNodes;

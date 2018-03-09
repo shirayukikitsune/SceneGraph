@@ -2,6 +2,7 @@
 
 #include <Base/Node.h>
 #include <Base/Scene.h>
+#include <Components/CameraComponent.h>
 #include <Components/CollisionShapeComponent.h>
 #include <Components/RigidBodyComponent.h>
 #include <Util/Easing.h>
@@ -63,6 +64,13 @@ void ExampleApplication::onInitialized()
 
     Scene->initialize();
 
+    // Add a camera to the scene
+    Camera = Scene->getRootNode()->addChildNode();
+    Camera->setName("Camera");
+    Camera->setTag("Camera");
+    Scene->setActiveCamera(Camera);
+    Camera->createComponent<sg::sdl::components::Camera>(60.0f, AspectRatio, 1000.0f, 0.1f);
+
     // Add a cube to the scene
     auto Node = Scene->getRootNode()->addChildNode();
     Node->setName("Cube");
@@ -73,13 +81,18 @@ void ExampleApplication::onInitialized()
     Node->setLocalTransform(transform);
     sg::sdl::prefabs::CreateCube(Node, false);
 
+    auto Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
+    Shader->append("example02.vert", sdlg::ShaderType::Vertex);
+    Shader->append("example02.frag", sdlg::ShaderType::Fragment);
+    Shader->linkShaders();
+
     // Add a new cube as a child of the first cube
     Node = Node->addChildNode();
     Node->setName("Cube 2");
     Node->setTag("Cube");
     sg::sdl::prefabs::CreateCube(Node, false);
 
-    auto Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
+    Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
     Shader->append("example02.vert", sdlg::ShaderType::Vertex);
     Shader->append("example02.frag", sdlg::ShaderType::Fragment);
     Shader->linkShaders();
@@ -152,4 +165,6 @@ void ExampleApplication::getWindowDimensions(int &width, int &height)
         width = 800;
         height = 600;
     }
+
+    AspectRatio = (float)width / (float)height;
 }

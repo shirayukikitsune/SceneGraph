@@ -1,8 +1,11 @@
 #pragma once
 
+#include "../Components/CameraComponent.h"
 #include "Vertex.h"
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <SDL2/SDL.h>
 
 #include <string>
@@ -10,7 +13,7 @@
 #include <fstream>
 #include <iostream>
 #include <deque>
-#include <Base/Component.h>
+#include <Components/SceneEventComponent.h>
 
 namespace kitsune {
 namespace scenegraph {
@@ -27,7 +30,7 @@ enum struct ShaderType : GLenum {
 };
 
 template <class VertexType>
-class Shader : public Component
+class Shader : public SceneEventComponent
 {
 	KIT_SG_COMPONENT(kitsune::scenegraph::sdl::graphics::Shader)
 	static_assert(std::is_base_of<vertex::BaseVertex, VertexType>::value, "VertexType must inherit from BaseVertex");
@@ -108,6 +111,8 @@ public:
 		if (isLinked == false)
 			printShaderLinkingError(shaderProgram);
 
+		MatrixID = glGetUniformLocation(shaderProgram, "MVP");
+
 		return isLinked != 0;
 	}
 
@@ -170,6 +175,21 @@ public:
 			glDeleteShader(shader);
 		}
 	}
+
+	void onPreUpdate(float DeltaTime) override {
+		glm::mat4 model;
+		auto node = getNode();
+		auto transform = node->getWorldTransform();
+	    transform.getOpenGLMatrix(glm::value_ptr(model));
+
+		auto camera = node->getScene()->getActiveCamera()->template getComponent<components::Camera>();
+
+		glm::mat4 mvp = camera->getProjection() * camera->getView() * model;
+
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+	}
+
+	GLuint MatrixID;
 
 	// The handle to our shader program
 	GLuint shaderProgram;

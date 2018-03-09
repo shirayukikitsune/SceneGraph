@@ -30,9 +30,11 @@ namespace sdl {
 
     private:
         std::shared_ptr<Scene> CurrentScene;
+		std::shared_ptr<Node> Camera;
         Application *_Application;
 
         bool Run;
+		float AspectRatio;
 
         float currentTime;
 	};
