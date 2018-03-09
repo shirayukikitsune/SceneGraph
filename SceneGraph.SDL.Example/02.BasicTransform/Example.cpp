@@ -66,35 +66,41 @@ void ExampleApplication::onInitialized()
 
     // Add a camera to the scene
     Camera = Scene->getRootNode()->addChildNode();
+    Camera->setLocalOffset(glm::vec3(5.0f, 0, -5.0f));
     Camera->setName("Camera");
     Camera->setTag("Camera");
     Scene->setActiveCamera(Camera);
-    Camera->createComponent<sg::sdl::components::Camera>(60.0f, AspectRatio, 1000.0f, 0.1f);
+    auto CameraComponent = Camera->createComponent<sg::sdl::components::Camera>(45.0f, AspectRatio, 0.5f, 1000.0f);
+    CameraComponent->setLookDirection(glm::vec3(-5.0f , 0, 5.0f));
 
     // Add a cube to the scene
     auto Node = Scene->getRootNode()->addChildNode();
     Node->setName("Cube");
     Node->setTag("Cube");
     // Scale the cube by 2.0
-    auto transform = Node->getLocalTransform();
-    transform.setBasis(transform.getBasis().scaled(btVector3(2.0f, 2.0f, 2.0f)));
-    Node->setLocalTransform(transform);
     sg::sdl::prefabs::CreateCube(Node, false);
 
     auto Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
     Shader->append("example02.vert", sdlg::ShaderType::Vertex);
     Shader->append("example02.frag", sdlg::ShaderType::Fragment);
+    Shader->registerEvents();
     Shader->linkShaders();
 
+    Node = Scene->getRootNode()->addChildNode();
+    Node->setName("Moon");
+    Node->setTag("Cube");
     // Add a new cube as a child of the first cube
     Node = Node->addChildNode();
     Node->setName("Cube 2");
     Node->setTag("Cube");
     sg::sdl::prefabs::CreateCube(Node, false);
+    Node->setLocalOffset(glm::vec3(0.0f, 2.0f, 0.0f));
+    Node->setLocalScale(glm::vec3(0.25f));
 
     Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
     Shader->append("example02.vert", sdlg::ShaderType::Vertex);
     Shader->append("example02.frag", sdlg::ShaderType::Fragment);
+    Shader->registerEvents();
     Shader->linkShaders();
 
     CurrentScene = Scene;
@@ -108,33 +114,22 @@ void ExampleApplication::onTerminating()
 void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
 {
     currentTime += frameTime.count();
-    int f = (int)currentTime % 2000;
-    float a = 0.0f;
 
     // We rotate the cubes a bit every frame
     auto Nodes = CurrentScene->findNodesByTag("Cube");
     for (auto i = Nodes.first; i != Nodes.second; ++i) {
         if (auto Node = i->second.lock()) {
-            auto step = Node->getName().compare("Cube") == 0 ? 0.03f : 0.015f;
-            btQuaternion rotation = Node->getLocalRotation();
+            auto step = Node->getName().compare("Cube") == 0 ? 0.01f : Node->getName().compare("Moon") == 0 ? 0.02f : 0.002f;
+            auto rotation = Node->getLocalRotation();
             float X, Y, Z;
-            rotation.getEulerZYX(Z, Y, X);
-            Z = -SIMD_PI / 18.0f;
-            Y += step;
-            rotation.setEuler(Y, X, Z);
+            auto angles = glm::eulerAngles(rotation);
+            angles.z += step;
+            rotation = glm::quat(angles);
             Node->setLocalRotation(rotation);
         }
     }
 
     // With the first cube local rotation, the second cube will orbit around the first while also rotating itself
-
-    if (f < 500) {
-        a = sg::util::Easing<sg::util::EasingFunction::CubicIn>()(f / 500.0f);
-    } else if (f < 1000) {
-        a = sg::util::Easing<sg::util::EasingFunction::CubicOut>()((1000 - f) / 500.0f);
-    }
-
-    _Application->getGraphics()->setClearColor(1.0f, a, a, a);
 
     CurrentScene->update(frameTime.count());
 }

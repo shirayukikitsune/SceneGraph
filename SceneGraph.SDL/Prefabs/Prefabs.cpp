@@ -22,7 +22,7 @@ void CreatePlane(std::shared_ptr<Node> node, bool addPhysics) {
         CollisionShape->setDimentions(btVector3(0, 1, 0));
         CollisionShape->setShape(sg::CollisionShapeComponent::ShapeFormat::Plane);
         
-        auto RigidBody = node->createComponent<sg::RigidBodyComponent>(0, sg::RigidBodyComponent::RigidBodyType::Static);
+        auto RigidBody = node->createComponent<sg::RigidBodyComponent>(0.0f, sg::RigidBodyComponent::RigidBodyType::Static);
     }
 
     // Add the Plane Material
@@ -58,7 +58,7 @@ void CreateCube(std::shared_ptr<Node> node, bool addPhysics) {
         CollisionShape->setDimentions(btVector3(0, 1, 0));
         CollisionShape->setShape(sg::CollisionShapeComponent::ShapeFormat::Box);
 
-        auto RigidBody = node->createComponent<sg::RigidBodyComponent>(0, sg::RigidBodyComponent::RigidBodyType::Static);
+        auto RigidBody = node->createComponent<sg::RigidBodyComponent>(0.0f, sg::RigidBodyComponent::RigidBodyType::Static);
     }
 
     // Add the Plane Material
@@ -68,9 +68,11 @@ void CreateCube(std::shared_ptr<Node> node, bool addPhysics) {
     // Create index buffer
     unsigned short cubeIndices[] = {
         2, 1, 0, 1, 2, 3,
-        6, 5, 4, 5, 6, 7,
+        5, 6, 4, 5, 7, 6,
         10, 9, 8, 9, 10, 11,
-        14, 13, 12, 13, 14, 15
+        14, 12, 13, 13, 15, 14,
+        18, 16, 17, 17, 19, 18,
+        22, 21, 20, 21, 22, 23,
     };
     typedef sdlg::ArrayBuffer<unsigned short, 1> IBType;
     auto cubeIndexBuffer = std::unique_ptr<IBType>(new IBType(sdlg::BufferTarget::Index));

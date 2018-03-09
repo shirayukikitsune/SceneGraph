@@ -67,7 +67,7 @@ void ConstraintComponent::createConstraint()
 	assert("Constraint not associated" && (!associated || !node));
 	assert("Constraint associated nodes with no rigid body" && (!associated->hasComponent<RigidBodyComponent>() || !node->hasComponent<RigidBodyComponent>()));
 
-	btTransform frameFromB = getOffsetFromNode().inverseTimes(associated->getLocalTransform());
+	btTransform frameFromB = getOffsetFromNode().inverseTimes(btTransform(btQuaternion(associated->getLocalRotation().x, associated->getLocalRotation().y, associated->getLocalRotation().z, associated->getLocalRotation().w), btVector3(associated->getLocalOffset().x, associated->getLocalOffset().y, associated->getLocalOffset().z)));
 
 	switch (Type)
 	{

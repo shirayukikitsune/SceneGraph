@@ -6,8 +6,8 @@
 #include <memory>
 #include <set>
 #include <string>
-
-#include <LinearMath/btTransform.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace kitsune {
 namespace scenegraph {
@@ -68,19 +68,23 @@ namespace scenegraph {
 
 		std::shared_ptr<Scene> getScene();
 
-		const btTransform & getWorldTransform();
-		void setWorldTransform(const btTransform & transform);
+		glm::mat4 getWorldTransform();
+		void setWorldTransform(const glm::mat4 & transform);
 
-		const btTransform & getLocalTransform() const { return LocalTransform; }
-		void setLocalTransform(const btTransform & transform) { LocalTransform = transform; invalidate(); }
+        glm::mat4 getLocalTransform() const;
+        void setLocalTransform(const glm::mat4 & transform);
 
-		btTransform getTransformToOrigin();
+        glm::mat4 getTransformToOrigin();
 
-		btVector3 getLocalOffset() const { return LocalTransform.getOrigin(); }
-		void setLocalOffset(const btVector3 & offset) { LocalTransform.setOrigin(offset); invalidate(); }
+        glm::vec3 getLocalOffset() const;
+        void setLocalOffset(const glm::vec3 & offset);
 
-		btQuaternion getLocalRotation() const { return LocalTransform.getRotation(); }
-		void setLocalRotation(const btQuaternion & rotation) { LocalTransform.setRotation(rotation); invalidate(); }
+        glm::quat getLocalRotation() const;
+        void setLocalRotation(const glm::quat & rotation);
+
+        glm::vec3 getLocalScale() const { return LocalScale; }
+        void setLocalScale(const glm::vec3 & scale) { LocalScale = scale; invalidate(); }
+
 
 		void resetTransform();
 
@@ -107,8 +111,11 @@ namespace scenegraph {
 		void invalidate();
 
 	private:
-		btTransform LocalTransform;
-		btTransform WorldTransform;
+		glm::quat LocalRotation;
+        glm::vec3 LocalOffset;
+        glm::vec3 LocalScale;
+
+        glm::mat4 WorldTransform;
 		bool RecalculateWorld;
 
 		std::string Name;

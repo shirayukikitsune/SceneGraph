@@ -31,7 +31,7 @@ add_library(scenegraph
         Util/Util.cpp
     )
 
-target_include_directories(scenegraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(scenegraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${GLM_INCLUDE_DIR})
 target_link_libraries(scenegraph LINK_INTERFACE_LIBRARIES ${BULLET_LIBRARIES})
 
 set_target_properties( 

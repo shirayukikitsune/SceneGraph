@@ -18,7 +18,7 @@ class Camera : public Component {
 public:
     Camera(float fov, float aspectRatio, float near, float far);
 
-    void setLookDirection(btVector3 direction);
+    void setLookDirection(glm::vec3 direction);
 
     glm::mat4 getView();
     glm::mat4 getProjection() { return projection; };

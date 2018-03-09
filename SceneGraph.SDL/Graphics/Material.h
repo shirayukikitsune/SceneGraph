@@ -65,7 +65,7 @@ namespace graphics {
             }
 
             glBindVertexArray(vertexArray);
-            glDrawElements(GL_TRIANGLES, indexBuffer->get().size(), getDrawElementType(), nullptr);
+            glDrawElements(GL_TRIANGLES, (GLsizei)indexBuffer->get().size(), getDrawElementType(), nullptr);
         }
 
         void initialize() override {

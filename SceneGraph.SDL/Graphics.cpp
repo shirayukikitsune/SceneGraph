@@ -13,13 +13,13 @@ Graphics::Graphics(int Width, int Height)
     // Set OpenGL Core profile
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     // Set a context flag to force only recent OpenGL functions
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG | SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
     // Enable double buffer and depth buffer
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     // Set min version as OpenGL 4.0 Core
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
     this->Window = SDL_CreateWindow("", 0, 0, Width, Height, SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
     if (!Window) {
@@ -38,6 +38,11 @@ Graphics::Graphics(int Width, int Height)
 
     // set a black clear color as default
     setClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 }
 
 Graphics::~Graphics()
@@ -58,7 +63,7 @@ void Graphics::setClearColor(float a, float r, float g, float b)
 
 void Graphics::clear()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Graphics::present()

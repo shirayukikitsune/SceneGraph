@@ -7,6 +7,8 @@
 #include <BulletCollision/CollisionShapes/btEmptyShape.h>
 
 #include <memory>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 using kitsune::scenegraph::RigidBodyComponent;
 namespace sg = kitsune::scenegraph;
@@ -37,7 +39,12 @@ namespace scenegraph {
 		virtual void getWorldTransform(btTransform & WorldTransform) const
 		{
             if (auto Ptr = ParentNode.lock()) {
-				WorldTransform = Ptr->getWorldTransform();
+                auto transform = Ptr->getWorldTransform();
+                glm::vec3 scale, translation, skew;
+                glm::quat rotation;
+                glm::vec4 perspective;
+                glm::decompose(transform, scale, rotation, translation, skew, perspective);
+                WorldTransform = btTransform(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w), btVector3(translation.x, translation.y, translation.z));
 			}
 			else WorldTransform = btTransform::getIdentity();
 		}
@@ -45,7 +52,17 @@ namespace scenegraph {
 		virtual void setWorldTransform(const btTransform & WorldTransform)
 		{
             if (auto Ptr = ParentNode.lock()) {
-				Ptr->setWorldTransform(WorldTransform);
+                auto transform = Ptr->getWorldTransform();
+                glm::vec3 scale, translation, skew;
+                glm::quat rotation;
+                glm::vec4 perspective;
+                glm::decompose(transform, scale, rotation, translation, skew, perspective);
+
+                auto r = WorldTransform.getRotation();
+
+                Ptr->setWorldTransform(glm::translate(glm::mat4(), glm::vec3(WorldTransform.getOrigin().x(), WorldTransform.getOrigin().y(), WorldTransform.getOrigin().z()))
+                    * glm::toMat4(glm::quat(r.x(), r.y(), r.z(), r.w()))
+                    * glm::scale(glm::mat4(), scale));
 			}
 		}
 	};
@@ -222,7 +239,15 @@ void RigidBodyComponent::onNodeSet()
 	nodeComponentRemovedListener = node->addComponentRemovedEvent(std::bind(&RigidBodyComponent::onNodeComponentRemoved, this, std::placeholders::_1));
 
 	static_cast<bulletMotionState*>(RigidBody->getMotionState())->setNode(node);
-	RigidBody->setCenterOfMassTransform(node->getWorldTransform());
+
+    auto transform = node->getWorldTransform();
+    glm::vec3 scale, translation, skew;
+    glm::quat rotation;
+    glm::vec4 perspective;
+    glm::decompose(transform, scale, rotation, translation, skew, perspective);
+    btTransform wt(btQuaternion(rotation.x, rotation.y, rotation.z, rotation.w), btVector3(translation.x, translation.y, translation.z));
+
+	RigidBody->setCenterOfMassTransform(wt);
 
 	auto CollisionShape = node->getComponent<CollisionShapeComponent>();
 	if (CollisionShape != nullptr) {

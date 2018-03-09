@@ -3,15 +3,20 @@
 #include "Component.h"
 #include "Scene.h"
 
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 using kitsune::scenegraph::Node;
 namespace sg = kitsune::scenegraph;
 
 Node::Node(std::weak_ptr<sg::Scene> Scene)
     : ParentScene(Scene)
 {
-	LocalTransform.setIdentity();
 	Active = true;
 	RecalculateWorld = true;
+    resetTransform();
 }
 
 Node::~Node()
@@ -110,11 +115,11 @@ std::shared_ptr<sg::Scene> Node::getScene()
 	return std::shared_ptr<kitsune::scenegraph::Scene>();
 }
 
-const btTransform & Node::getWorldTransform()
+glm::mat4 Node::getWorldTransform()
 {
 	if (RecalculateWorld) {
 		if (auto Parent = getParentNode()) {
-			WorldTransform.mult(Parent->getWorldTransform(), getLocalTransform());
+			WorldTransform = Parent->getWorldTransform() * getLocalTransform();
 		}
 		else {
 			WorldTransform = getLocalTransform();
@@ -126,23 +131,62 @@ const btTransform & Node::getWorldTransform()
 	return WorldTransform;
 }
 
-void Node::setWorldTransform(const btTransform & transform)
+void Node::setWorldTransform(const glm::mat4 & transform)
 {
-	setLocalTransform(getTransformToOrigin().inverseTimes(transform));
+	setLocalTransform(getTransformToOrigin() * transform);
 }
 
-btTransform Node::getTransformToOrigin()
+glm::mat4 Node::getLocalTransform() const
+{
+    return glm::translate(glm::mat4(), LocalOffset) * glm::toMat4(LocalRotation) * glm::scale(glm::mat4(), LocalScale);
+}
+
+void Node::setLocalTransform(const glm::mat4 & transform)
+{
+    glm::vec3 skew;
+    glm::vec4 perspective;
+
+    glm::decompose(transform, LocalScale, LocalRotation, LocalOffset, skew, perspective);
+
+    invalidate();
+}
+
+glm::mat4 Node::getTransformToOrigin()
 {
 	if (auto Parent = getParentNode()) {
-		return Parent->getWorldTransform().inverse();
+		return glm::affineInverse(Parent->getWorldTransform());
 	}
 
-	return btTransform::getIdentity();
+	return glm::mat4();
+}
+
+glm::vec3 Node::getLocalOffset() const
+{
+    return LocalOffset;
+}
+
+void Node::setLocalOffset(const glm::vec3 & offset)
+{
+    LocalOffset = offset;
+    invalidate();
+}
+
+glm::quat Node::getLocalRotation() const
+{
+    return LocalRotation;
+}
+
+void Node::setLocalRotation(const glm::quat & rotation)
+{
+    LocalRotation = rotation;
+    invalidate();
 }
 
 void Node::resetTransform()
 {
-	LocalTransform.setIdentity();
+    LocalOffset = glm::vec3(0.0f);
+    LocalRotation = glm::quat();
+    LocalScale = glm::vec3(1.0f);
 	invalidate();
 }
 
