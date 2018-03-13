@@ -18,6 +18,7 @@ add_library(scenegraph-sdl
         Components/CameraComponent.cpp
         Events/SDLEventHandler.cpp
         Graphics/Buffer.cpp
+        Graphics/ModelLoaderFactory.cpp
         Prefabs/Prefabs.cpp
     )
 
