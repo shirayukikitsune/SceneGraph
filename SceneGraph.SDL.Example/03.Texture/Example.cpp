@@ -9,7 +9,7 @@
 
 #include <Graphics/Buffer.h>
 #include <Graphics/Material.h>
-#include <Graphics/Shader.h>
+#include <Graphics/DiffuseShader.h>
 #include <Prefabs/Prefabs.h>
 
 using kitsune::scenegraph::sdl::Application;
@@ -34,7 +34,7 @@ ExampleApplication::ExampleApplication()
 void ExampleApplication::onInitializing(sg::sdl::Application * Application)
 {
     _Application = Application;
-    _Application->setWindowTitle("Scenegraph Example 02 - Basic Transform");
+    _Application->setWindowTitle("Scenegraph Example 03 - Texture");
 }
 
 void ExampleApplication::onInitialized()
@@ -80,26 +80,10 @@ void ExampleApplication::onInitialized()
     // Scale the cube by 2.0
     sg::sdl::prefabs::CreateCube(Node, false);
 
-    auto Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
-    Shader->append("example02.vert", sdlg::ShaderType::Vertex);
-    Shader->append("example02.frag", sdlg::ShaderType::Fragment);
-    Shader->registerEvents();
-    Shader->linkShaders();
-
-    Node = Scene->getRootNode()->addChildNode();
-    Node->setName("Moon");
-    Node->setTag("Cube");
-    // Add a new cube as a child of the first cube
-    Node = Node->addChildNode();
-    Node->setName("Cube 2");
-    Node->setTag("Cube");
-    sg::sdl::prefabs::CreateCube(Node, false);
-    Node->setLocalOffset(glm::vec3(0.0f, 2.0f, 0.0f));
-    Node->setLocalScale(glm::vec3(0.25f));
-
-    Shader = Node->createComponent<sdlg::Shader<sdlg::vertex::PositionNormalUVVertex>>();
-    Shader->append("example02.vert", sdlg::ShaderType::Vertex);
-    Shader->append("example02.frag", sdlg::ShaderType::Fragment);
+    auto Shader = Node->createComponent<sdlg::DiffuseShader<sdlg::vertex::PositionNormalUVVertex>>();
+    Shader->append("example03.vert", sdlg::ShaderType::Vertex);
+    Shader->append("example03.frag", sdlg::ShaderType::Fragment);
+    Shader->loadTexture(sdlg::DiffuseShader<sdlg::vertex::PositionNormalUVVertex>::TextureIndex::Diffuse, "sample.jpg");
     Shader->registerEvents();
     Shader->linkShaders();
 

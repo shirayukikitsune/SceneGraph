@@ -1,3 +1,5 @@
+add_subdirectory(Vendor)
+
 set(HEADER_FILES
         Application.h
         Bootstrap.h
@@ -5,7 +7,12 @@ set(HEADER_FILES
         Components/CameraComponent.h
         Events/SDLEventHandler.h
         Graphics/Buffer.h
+        Graphics/DiffuseShader.h
         Graphics/Material.h
+        Graphics/Model.h
+        Graphics/ModelLoader.h
+        Graphics/ModelLoaderFactory.h
+        Graphics/OBJModelLoader.ipp
         Graphics/Shader.h
         Graphics/Vertex.h
         Prefabs/Prefabs.h
@@ -22,8 +29,8 @@ add_library(scenegraph-sdl
         Prefabs/Prefabs.cpp
     )
 
-target_include_directories(scenegraph-sdl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/glad/include ${CMAKE_SOURCE_DIR}/SceneGraph ${SDL2_INCLUDE_DIR} ${GLM_INCLUDE_DIR})
-target_link_libraries(scenegraph-sdl LINK_INTERFACE_LIBRARIES scenegraph glad ${SDL2_LIBRARY} ${CMAKE_DL_LIBS})
+target_include_directories(scenegraph-sdl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/Vendor/SOIL ${CMAKE_SOURCE_DIR}/glad/include ${CMAKE_SOURCE_DIR}/SceneGraph ${SDL2_INCLUDE_DIR} ${GLM_INCLUDE_DIR})
+target_link_libraries(scenegraph-sdl LINK_INTERFACE_LIBRARIES scenegraph glad soil ${SDL2_LIBRARY} ${CMAKE_DL_LIBS})
 
 set_target_properties( 
     scenegraph

@@ -64,6 +64,8 @@ GLenum convertBufferFrequencyAndAccess(BufferFrequency frequency, BufferAccess a
                     return GL_DYNAMIC_COPY;
             }
     }
+
+    return GL_STREAM_COPY;
 }
 
 }

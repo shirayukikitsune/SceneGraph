@@ -39,6 +39,10 @@ namespace graphics {
         typedef std::unique_ptr<ArrayBuffer<IndexType, 1>> IndexBufferType;
         typedef std::unique_ptr<ArrayBuffer<VertexType, 1>> VertexBufferType;
 
+        Material() : ambientColor(1.0f), diffuseColor(1.0f), specularColor(1.0f) {
+            shininess = 1.0f;
+        }
+
         void setIndexBuffer(IndexBufferType && buffer) {
             indexBuffer = std::move(buffer);
         }
@@ -57,18 +61,18 @@ namespace graphics {
         }
 
         void render() override {
-            if (shader) {
-                shader->useProgram();
-            } else {
-                // Ensure no shader in this case
-                glUseProgram(0);
+            if (!shader) {
+                // Don't render if there is no shader attached
+                return;
             }
+            shader->useProgram();
 
             glBindVertexArray(vertexArray);
             glDrawElements(GL_TRIANGLES, (GLsizei)indexBuffer->get().size(), getDrawElementType(), nullptr);
         }
 
         void initialize() override {
+            // This allow hotswapping shaders
             shader = getNode()->template getComponent<Shader<VertexType>>();
             getNode()->addComponentAddedEvent([this](Component *component) {
                 if (component->getComponentNameHash() == Shader<VertexType>::componentNameHash) {
@@ -81,7 +85,19 @@ namespace graphics {
                 }
             });
         }
-        
+
+        void setAmbientColor(glm::vec4 color) { ambientColor = color; }
+        glm::vec4 getAmbientColor() { return ambientColor; }
+
+        void setDiffuseColor(glm::vec4 color) { diffuseColor = color; }
+        glm::vec4 getDiffuseColor() { return diffuseColor; }
+
+        void setSpecularColor(glm::vec4 color) { specularColor = color; }
+        glm::vec4 getSpecularColor() { return specularColor; }
+
+        void setShininess(float value) { shininess = value; }
+        float getShininess() { return shininess; }
+
     private:
         IndexBufferType indexBuffer;
         VertexBufferType vertexBuffer;
@@ -89,6 +105,11 @@ namespace graphics {
         GLuint vertexArray;
 
         Shader<VertexType>* shader;
+
+        glm::vec4 ambientColor;
+        glm::vec4 diffuseColor;
+        glm::vec4 specularColor;
+        float shininess;
     };
 
 }

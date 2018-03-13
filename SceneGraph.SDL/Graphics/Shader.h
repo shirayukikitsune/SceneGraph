@@ -36,30 +36,20 @@ class Shader : public SceneEventComponent
 	static_assert(std::is_base_of<vertex::BaseVertex, VertexType>::value, "VertexType must inherit from BaseVertex");
 
 public:
-	std::string readFile(const char* file)
-	{
-		// Open file
-		std::ifstream t(file);
-
-		// Read file into buffer
-		std::stringstream buffer;
-		buffer << t.rdbuf();
-
-		// Make a std::string and fill it with the contents of buffer
-		std::string fileContent = buffer.str();
-
-		return fileContent;
-	}
+    virtual ~Shader()
+    {
+        cleanUp();
+    }
 
 	void useProgram()
 	{
 		// Load the shader into the rendering pipeline
 		glUseProgram(shaderProgram);
 
-        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+        setUniforms();
     }
 
-	void initialize() override
+	virtual void initialize() override
 	{
 		// Generate our shader. This is similar to glGenBuffers() and glGenVertexArray(), except that this returns the ID
 		shaderProgram = glCreateProgram();
@@ -73,7 +63,7 @@ public:
 		std::string str = readFile(filename.c_str());
 
 		// c_str() gives us a const char*, but we need a non-const one
-		int32_t size = str.length();
+		int32_t size = (int32_t)str.length();
 
 		// Create an shader handle
 		GLuint shader = glCreateShader((GLenum)type);
@@ -113,56 +103,12 @@ public:
 		if (isLinked == false)
 			printShaderLinkingError(shaderProgram);
 
-		MatrixID = glGetUniformLocation(shaderProgram, "MVP");
+        getUniforms();
 
 		return isLinked != 0;
 	}
 
-	void printShaderLinkingError(int32_t shaderId)
-	{
-		std::cout << "=======================================\n";
-		std::cout << "Shader linking failed : " << std::endl;
-
-		// Find length of shader info log
-		int maxLength;
-		glGetProgramiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
-
-		std::cout << "Info Length : " << maxLength << std::endl;
-
-		// Get shader info log
-		char* shaderProgramInfoLog = new char[maxLength];
-		glGetProgramInfoLog(shaderProgram, maxLength, &maxLength, shaderProgramInfoLog);
-
-		std::cout << "Linker error message : " << shaderProgramInfoLog << std::endl;
-
-		/* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
-		/* In this simple program, we'll just leave */
-		delete[] shaderProgramInfoLog;
-		return;
-	}
-
-	// If something went wrong whil compiling the shaders, we'll use this function to find the error
-	void printShaderCompilationErrorInfo(int32_t shaderId)
-	{
-		std::cout << "=======================================\n";
-		std::cout << "Shader compilation failed : " << std::endl;
-
-		// Find length of shader info log
-		int maxLength;
-		glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
-
-		// Get shader info log
-		char* shaderInfoLog = new char[maxLength];
-		glGetShaderInfoLog(shaderId, maxLength, &maxLength, shaderInfoLog );
-
-		// Print shader info log
-		std::cout << "\tError info : " << shaderInfoLog << std::endl;
-
-		std::cout << "=======================================\n\n";
-		delete[] shaderInfoLog;
-	}
-
-	void cleanUp()
+	virtual void cleanUp()
 	{
 		/* Cleanup all the things we bound and allocated */
 		glUseProgram(0);
@@ -176,9 +122,11 @@ public:
 		for (auto & shader : shaders) {
 			glDeleteShader(shader);
 		}
+
+        shaders.clear();
 	}
 
-	void onPreUpdate(float DeltaTime) override {
+	virtual void onPreUpdate(float DeltaTime) override {
 		auto node = getNode();
 		auto model = node->getWorldTransform();
 
@@ -189,16 +137,85 @@ public:
 
     uint32_t getAttachedEvents() override { return (uint32_t)AttachedEvents::PreUpdate; }
 
+protected:
+    // The handle to our shader program
+    GLuint shaderProgram;
+
+    virtual void setUniforms()
+    {
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+    }
+
+    virtual void getUniforms()
+    {
+        MatrixID = glGetUniformLocation(shaderProgram, "MVP");
+    }
+
 private:
     glm::mat4 mvp;
 	GLuint MatrixID;
 
-	// The handle to our shader program
-	GLuint shaderProgram;
-
 	// The handles to each added shader
 	std::deque<GLuint> shaders;
 
+    std::string readFile(const char* file)
+    {
+        // Open file
+        std::ifstream t(file);
+
+        // Read file into buffer
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+
+        // Make a std::string and fill it with the contents of buffer
+        std::string fileContent = buffer.str();
+
+        return fileContent;
+    }
+
+    void printShaderLinkingError(int32_t shaderId)
+    {
+        std::cout << "=======================================\n";
+        std::cout << "Shader linking failed : " << std::endl;
+
+        // Find length of shader info log
+        int maxLength;
+        glGetProgramiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
+
+        std::cout << "Info Length : " << maxLength << std::endl;
+
+        // Get shader info log
+        char* shaderProgramInfoLog = new char[maxLength];
+        glGetProgramInfoLog(shaderProgram, maxLength, &maxLength, shaderProgramInfoLog);
+
+        std::cout << "Linker error message : " << shaderProgramInfoLog << std::endl;
+
+        /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
+        /* In this simple program, we'll just leave */
+        delete[] shaderProgramInfoLog;
+        return;
+    }
+
+    // If something went wrong whil compiling the shaders, we'll use this function to find the error
+    void printShaderCompilationErrorInfo(int32_t shaderId)
+    {
+        std::cout << "=======================================\n";
+        std::cout << "Shader compilation failed : " << std::endl;
+
+        // Find length of shader info log
+        int maxLength;
+        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
+
+        // Get shader info log
+        char* shaderInfoLog = new char[maxLength];
+        glGetShaderInfoLog(shaderId, maxLength, &maxLength, shaderInfoLog);
+
+        // Print shader info log
+        std::cout << "\tError info : " << shaderInfoLog << std::endl;
+
+        std::cout << "=======================================\n\n";
+        delete[] shaderInfoLog;
+    }
 };
 
 }

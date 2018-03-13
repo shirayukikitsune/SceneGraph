@@ -8,6 +8,7 @@
 #include "OBJModelLoader.ipp"
 
 using kitsune::scenegraph::sdl::graphics::ModelLoaderFactory;
+namespace sg = kitsune::scenegraph;
 namespace sdlg = kitsune::scenegraph::sdl::graphics;
 
 std::map<std::string, sdlg::ModelLoader*> ModelLoaderFactory::loaders;
@@ -22,7 +23,7 @@ void ModelLoaderFactory::registerDefaultLoaders()
     registerLoader("obj", new sdlg::implementations::OBJModelLoader);
 }
 
-void ModelLoaderFactory::load(std::shared_ptr<Node> node, const std::string &file, std::ios_base::openmode mode)
+void ModelLoaderFactory::load(std::shared_ptr<sg::Node> node, const std::string &file, std::ios_base::openmode mode)
 {
     auto extension = kitsune::scenegraph::util::getExtension(file);
 
@@ -33,7 +34,7 @@ void ModelLoaderFactory::load(std::shared_ptr<Node> node, const std::string &fil
     filestream.close();
 }
 
-void ModelLoaderFactory::load(std::shared_ptr<Node> node, const std::string &extension, std::istream &stream)
+void ModelLoaderFactory::load(std::shared_ptr<sg::Node> node, const std::string &extension, std::istream &stream)
 {
     auto loader = ModelLoaderFactory::loaders.find(extension);
 
