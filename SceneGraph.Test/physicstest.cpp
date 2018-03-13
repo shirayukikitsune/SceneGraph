@@ -1,6 +1,7 @@
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE kitsune::scenegraph::PhysicsScene
 #include <boost/test/unit_test.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Base/Node.h"
 #include "Base/PhysicsScene.h"
@@ -28,7 +29,7 @@ BOOST_AUTO_TEST_CASE(PhysicsFreeFall, * utf::tolerance(0.005f))
 	auto Scene = makeScene();
 
 	auto Node = Scene->getRootNode()->addChildNode();
-	Node->setLocalOffset(btVector3(0, 5.0f, 0));
+	Node->setLocalOffset(glm::vec3(0, 5.0f, 0));
 
 	auto CollisionShape = Node->createComponent<sg::CollisionShapeComponent>();
 	CollisionShape->setDimentions(btVector3(1, 1, 1));
@@ -43,9 +44,10 @@ BOOST_AUTO_TEST_CASE(PhysicsFreeFall, * utf::tolerance(0.005f))
 	BOOST_TEST(RigidBody->getLinearVelocity().y() == -10.0f, "Y velocity is -10 (" << RigidBody->getLinearVelocity().y() << ")");
 	BOOST_TEST(RigidBody->getLinearVelocity().z() == 0.0f, "Z velocity is zero (" << RigidBody->getLinearVelocity().z() << ")");
 
-	BOOST_TEST(Node->getWorldTransform().getOrigin().x() == 0.0f, "X position is zero (" << Node->getWorldTransform().getOrigin().x() << ")");
-	BOOST_TEST(Node->getWorldTransform().getOrigin().y() == 0.0f, "Y position is zero (" << Node->getWorldTransform().getOrigin().y() << ")");
-	BOOST_TEST(Node->getWorldTransform().getOrigin().z() == 0.0f, "Z position is zero (" << Node->getWorldTransform().getOrigin().z() << ")");
+	glm::vec3 translation(Node->getWorldTransform()[3]);
+	BOOST_TEST(translation.x == 0.0f, "X position is zero (" << translation.x << ")");
+	BOOST_TEST(translation.y == 0.0f, "Y position is zero (" << translation.y << ")");
+	BOOST_TEST(translation.z == 0.0f, "Z position is zero (" << translation.z << ")");
 }
 
 BOOST_AUTO_TEST_CASE(PhysicsCollision, * utf::tolerance(0.005f))
@@ -53,7 +55,7 @@ BOOST_AUTO_TEST_CASE(PhysicsCollision, * utf::tolerance(0.005f))
 	auto Scene = makeScene();
 
 	auto PlaneNode = Scene->getRootNode()->addChildNode();
-	PlaneNode->setWorldTransform(btTransform::getIdentity());
+	PlaneNode->setWorldTransform(glm::mat4());
 	auto CollisionShape = PlaneNode->createComponent<sg::CollisionShapeComponent>();
 	CollisionShape->setDimentions(btVector3(0, 1, 0)); // +y = up
 	CollisionShape->setPlaneConstant(0.0f);
@@ -61,7 +63,7 @@ BOOST_AUTO_TEST_CASE(PhysicsCollision, * utf::tolerance(0.005f))
 	auto RigidBody = PlaneNode->createComponent<sg::RigidBodyComponent>(0.0f, sg::RigidBodyComponent::RigidBodyType::Static);
 
 	auto BoxNode = Scene->getRootNode()->addChildNode();
-	BoxNode->setWorldTransform(btTransform(btQuaternion::getIdentity(), btVector3(0, 50, 0)));
+	BoxNode->setWorldTransform(glm::translate(glm::mat4(), glm::vec3(0, 50.0f, 0)));
 	CollisionShape = BoxNode->createComponent<sg::CollisionShapeComponent>();
 	CollisionShape->setDimentions(btVector3(1, 1, 1)); // x=-1:1; y=49:51; z=-1:1
 	CollisionShape->setShape(sg::CollisionShapeComponent::ShapeFormat::Box);
@@ -71,7 +73,8 @@ BOOST_AUTO_TEST_CASE(PhysicsCollision, * utf::tolerance(0.005f))
 		Scene->update(1.0f / 1200.0f);
 
 	// The box should have hit the plane with its lower face (box's y should go from 0 to 2), so the center of mass position is 1
-	BOOST_TEST(BoxNode->getWorldTransform().getOrigin().y() == 1.0f, "Y position is not 1 (" << BoxNode->getWorldTransform().getOrigin().y() << ")");
+	glm::vec3 translation(BoxNode->getWorldTransform()[3]);
+	BOOST_TEST(translation.y == 1.0f, "Y position is not 1 (" << translation.y << ")");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

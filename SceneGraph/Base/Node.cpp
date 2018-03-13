@@ -138,13 +138,15 @@ void Node::setWorldTransform(const glm::mat4 & transform)
 
 glm::mat4 Node::getLocalTransform() const
 {
-    return glm::translate(glm::mat4(), LocalOffset) * glm::toMat4(LocalRotation) * glm::scale(glm::mat4(), LocalScale);
+    return LocalTransform;
 }
 
 void Node::setLocalTransform(const glm::mat4 & transform)
 {
     glm::vec3 skew;
     glm::vec4 perspective;
+
+	LocalTransform = transform;
 
     glm::decompose(transform, LocalScale, LocalRotation, LocalOffset, skew, perspective);
 
@@ -168,6 +170,7 @@ glm::vec3 Node::getLocalOffset() const
 void Node::setLocalOffset(const glm::vec3 & offset)
 {
     LocalOffset = offset;
+	LocalTransform = glm::translate(glm::mat4(), LocalOffset) * glm::toMat4(LocalRotation) * glm::scale(glm::mat4(), LocalScale);
     invalidate();
 }
 
@@ -179,7 +182,20 @@ glm::quat Node::getLocalRotation() const
 void Node::setLocalRotation(const glm::quat & rotation)
 {
     LocalRotation = rotation;
+	LocalTransform = glm::translate(glm::mat4(), LocalOffset) * glm::toMat4(LocalRotation) * glm::scale(glm::mat4(), LocalScale);
     invalidate();
+}
+
+glm::vec3 Node::getLocalScale() const
+{
+	return LocalScale;
+}
+
+void Node::setLocalScale(const glm::vec3 & scale)
+{
+	LocalScale = scale;
+	LocalTransform = glm::translate(glm::mat4(), LocalOffset) * glm::toMat4(LocalRotation) * glm::scale(glm::mat4(), LocalScale);
+	invalidate();
 }
 
 void Node::resetTransform()
@@ -187,6 +203,7 @@ void Node::resetTransform()
     LocalOffset = glm::vec3(0.0f);
     LocalRotation = glm::quat();
     LocalScale = glm::vec3(1.0f);
+	LocalTransform = glm::mat4();
 	invalidate();
 }
 

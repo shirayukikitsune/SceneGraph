@@ -82,9 +82,8 @@ namespace scenegraph {
         glm::quat getLocalRotation() const;
         void setLocalRotation(const glm::quat & rotation);
 
-        glm::vec3 getLocalScale() const { return LocalScale; }
-        void setLocalScale(const glm::vec3 & scale) { LocalScale = scale; invalidate(); }
-
+        glm::vec3 getLocalScale() const;
+        void setLocalScale(const glm::vec3 & scale);
 
 		void resetTransform();
 
@@ -114,6 +113,7 @@ namespace scenegraph {
 		glm::quat LocalRotation;
         glm::vec3 LocalOffset;
         glm::vec3 LocalScale;
+		glm::mat4 LocalTransform;
 
         glm::mat4 WorldTransform;
 		bool RecalculateWorld;

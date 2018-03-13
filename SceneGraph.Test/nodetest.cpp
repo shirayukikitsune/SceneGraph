@@ -2,10 +2,16 @@
 #define BOOST_TEST_MODULE kitsune::scenegraph::Node
 #include <boost/test/unit_test.hpp>
 #include <memory>
+#include <iostream>
+
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "Base/Component.h"
 #include "Base/Node.h"
 #include "Base/Scene.h"
+#include "Util/Constants.h"
 
 namespace sg = kitsune::scenegraph;
 
@@ -14,6 +20,17 @@ std::shared_ptr<sg::Scene> makeScene() {
 	Scene->initialize();
 
 	return Scene;
+}
+
+bool mat4Compare(glm::mat4 &a, glm::mat4 &b, double epsilon) {
+	for (int i = 0; i < 16; ++i) {
+		if (fabs(a[i / 4][i % 4] - b[i / 4][i % 4]) > epsilon) {
+			std::cout << "i: " << i << "; a: " << a[i / 4][i % 4] << "; b: " << b[i / 4][i % 4] << std::endl;
+			return false;
+		}
+	}
+
+	return true;
 }
 
 BOOST_AUTO_TEST_SUITE(Node)
@@ -36,59 +53,71 @@ BOOST_AUTO_TEST_CASE(NodeTransform)
 {
 	auto Scene = makeScene();
 	auto RootNode = Scene->getRootNode();
-	btTransform testTransform(btQuaternion(btVector3(0, 1, 0), SIMD_HALF_PI), btVector3(1, 0, 0));
+	glm::vec3 translation(1.0f, 0, 0);
+	glm::quat rotation(0, 1.0f, 0, kitsune::scenegraph::util::PI_2);
+	glm::mat4 testTransform = glm::translate(glm::mat4(), translation) * glm::toMat4(rotation);
 
 	BOOST_TEST((RootNode != nullptr), "Scene without root node");
 
-	RootNode->setLocalOffset(testTransform.getOrigin());
-	RootNode->setLocalRotation(testTransform.getRotation());
+	RootNode->setLocalOffset(translation);
+	RootNode->setLocalRotation(rotation);
 
-	BOOST_TEST((RootNode->getWorldTransform().getOrigin() == testTransform.getOrigin()), "Invalid world position");
-	BOOST_TEST((RootNode->getLocalOffset() == testTransform.getOrigin()), "Invalid local position");
-	BOOST_TEST((RootNode->getWorldTransform().getRotation() == testTransform.getRotation()), "Invalid world rotation");
-	BOOST_TEST((RootNode->getLocalRotation() == testTransform.getRotation()), "Invalid local rotation");
+	BOOST_TEST((glm::vec3(RootNode->getWorldTransform()[3]) == translation), "Invalid world position");
+	BOOST_TEST((RootNode->getLocalOffset() == translation), "Invalid local position");
+	BOOST_TEST((glm::toQuat(RootNode->getWorldTransform()) == rotation), "Invalid world rotation");
+	BOOST_TEST((RootNode->getLocalRotation() == rotation), "Invalid local rotation");
 
 	RootNode->resetTransform();
 
-	BOOST_TEST((RootNode->getLocalTransform() == btTransform::getIdentity()), "Root node with non-identity local transform");
-	BOOST_TEST((RootNode->getWorldTransform() == btTransform::getIdentity()), "Root node with non-identity world transform");
+	BOOST_TEST((RootNode->getLocalTransform() == glm::mat4()), "Root node with non-identity local transform");
+	BOOST_TEST((RootNode->getWorldTransform() == glm::mat4()), "Root node with non-identity world transform");
 
 	RootNode->setWorldTransform(testTransform);
 
-	BOOST_TEST((RootNode->getWorldTransform() == testTransform), "Root node with invalid world transform");
+	glm::mat4 m = RootNode->getWorldTransform();
+	BOOST_TEST((mat4Compare(m, testTransform, 1e-5)), "Root node with invalid world transform");
 
 	RootNode->resetTransform();
 
 	RootNode->setLocalTransform(testTransform);
 
-	BOOST_TEST((RootNode->getLocalTransform() == testTransform), "Root node with invalid local transform");
+	m = RootNode->getLocalTransform();
+	BOOST_TEST((mat4Compare(m, testTransform, 1e-5)), "Root node with invalid local transform");
 }
 
 BOOST_AUTO_TEST_CASE(NodeTransformPropagation)
 {
 	auto Scene = makeScene();
 	auto RootNode = Scene->getRootNode();
-	btTransform testTransform(btQuaternion(btVector3(0, 1, 0), SIMD_HALF_PI), btVector3(1, 0, 0));
+	glm::vec3 translation(1.0f, 0, 0);
+	glm::quat rotation = glm::angleAxis(kitsune::scenegraph::util::PI_2, glm::vec3(0, 1.0f, 0));
+	glm::mat4 testTransform = glm::translate(glm::mat4(), translation) * glm::toMat4(rotation);
 
 	BOOST_TEST((RootNode != nullptr), "Scene without root node");
 
-	RootNode->setLocalTransform(testTransform);
 	auto ChildNode = RootNode->addChildNode();
+	auto SecondChild = ChildNode->addChildNode();
 
-	BOOST_TEST((ChildNode->getWorldTransform().getOrigin() == testTransform.getOrigin()), "Invalid world position");
-	BOOST_TEST((ChildNode->getWorldTransform().getRotation() == testTransform.getRotation()), "Invalid world rotation");
+	ChildNode->setLocalTransform(testTransform);
 
-	BOOST_TEST((ChildNode->getLocalTransform().getOrigin() == btVector3(0, 0, 0)), "Invalid local position");
-	BOOST_TEST((ChildNode->getLocalTransform().getRotation() == btQuaternion::getIdentity()), "Invalid local rotation");
+	BOOST_TEST((glm::vec3(SecondChild->getWorldTransform()[3]) == translation), "Invalid world position");
+	glm::quat worldRotation = glm::toQuat(SecondChild->getWorldTransform());
+	BOOST_TEST((fabsf(rotation.x - worldRotation.x) <= 1e-5f), "Invalid world rotation");
+	BOOST_TEST((fabsf(rotation.y - worldRotation.y) <= 1e-5f), "Invalid world rotation");
+	BOOST_TEST((fabsf(rotation.z - worldRotation.z) <= 1e-5f), "Invalid world rotation");
+	BOOST_TEST((fabsf(rotation.w - worldRotation.w) <= 1e-5f), "Invalid world rotation");
 
-	BOOST_TEST((ChildNode->getTransformToOrigin() == testTransform.inverse()), "Invalid transform to origin");
+	BOOST_TEST((SecondChild->getLocalTransform() == glm::mat4()), "Invalid local transform");
 
-	RootNode->resetTransform();
+	glm::mat4 testInverse = glm::affineInverse(testTransform);
+	glm::mat4 toOrigin = SecondChild->getTransformToOrigin();
+	BOOST_TEST((mat4Compare(toOrigin, testInverse, 1e-5)), "Invalid transform to origin");
 
-	BOOST_TEST((ChildNode->getWorldTransform().getOrigin() == btVector3(0, 0, 0)), "Invalid world position");
-	BOOST_TEST((ChildNode->getWorldTransform().getRotation() == btQuaternion::getIdentity()), "Invalid world rotation");
+	ChildNode->resetTransform();
 
-	BOOST_TEST((ChildNode->getTransformToOrigin() == btTransform::getIdentity()), "Invalid transform to origin");
+	BOOST_TEST((SecondChild->getWorldTransform() == glm::mat4()), "Invalid world rotation");
+
+	BOOST_TEST((SecondChild->getTransformToOrigin() == glm::mat4()), "Invalid transform to origin");
 }
 
 BOOST_AUTO_TEST_CASE(NodeActive)
