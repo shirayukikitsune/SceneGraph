@@ -31,7 +31,7 @@ namespace scenegraph {
 		Node * getRootNode() { return RootNode.get(); }
 
 		std::shared_ptr<Node> getActiveCamera() { return ActiveCamera.lock(); }
-		void setActiveCamera(std::shared_ptr<Node> &Camera) { ActiveCamera = Camera; }
+		void setActiveCamera(std::shared_ptr<Node> Camera) { ActiveCamera = Camera; }
 
         ///! Renders the scene
         void render();

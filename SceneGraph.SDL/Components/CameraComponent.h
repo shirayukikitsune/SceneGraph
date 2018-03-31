@@ -19,9 +19,13 @@ public:
     Camera(float fov, float aspectRatio, float near, float far);
 
     void setLookDirection(glm::vec3 direction);
+    glm::vec3 getLookDirection() { return lookDirection; }
 
     glm::mat4 getView();
-    glm::mat4 getProjection() { return projection; };
+    glm::mat4 getProjection() { return projection; }
+
+protected:
+    void onNodeSet() override;
 };
 
 }

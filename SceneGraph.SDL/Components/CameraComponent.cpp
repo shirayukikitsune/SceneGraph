@@ -1,6 +1,8 @@
 #include "CameraComponent.h"
 
 #include <Base/Node.h>
+#include <Base/Scene.h>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -24,4 +26,16 @@ glm::mat4 Camera::getView() {
     glm::vec3 nextPosition = currentPosition + lookDirection;
 
     return glm::lookAtRH(currentPosition, nextPosition, glm::vec3(0, 1, 0));
+}
+
+void Camera::onNodeSet() {
+    auto Scene = this->getScene();
+
+    if (!Scene) {
+        return;
+    }
+
+    if (!Scene->getActiveCamera()) {
+        Scene->setActiveCamera(getNode());
+    }
 }
