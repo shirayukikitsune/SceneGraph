@@ -12,12 +12,13 @@ out vec2 fTexCoord;
 uniform mat4 modelView;
 uniform mat3 normal;
 uniform mat4 projection;
+uniform vec3 lightDirection;
   
 void main(){
     vec4 eyePosition = modelView * vec4(in_Position, 1.0);
 
     fN = normal * in_Normal;
-    fL = vec3(-1, -1, -1);
+    fL = lightDirection;
     fE = -eyePosition.xyz;
     fTexCoord = in_UV;
 

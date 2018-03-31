@@ -139,7 +139,10 @@ public:
 
 protected:
     // The handle to our shader program
-    GLuint shaderProgram;
+    GLuint getShaderProgram()
+	{
+		return shaderProgram;
+	}
 
     virtual void setUniforms()
     {
@@ -153,6 +156,7 @@ protected:
 
 private:
     glm::mat4 mvp;
+	GLuint shaderProgram;
 	GLuint MatrixID;
 
 	// The handles to each added shader

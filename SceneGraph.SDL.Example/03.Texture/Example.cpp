@@ -4,11 +4,13 @@
 #include <Base/Scene.h>
 #include <Components/CameraComponent.h>
 #include <Components/CollisionShapeComponent.h>
+#include <Components/LightComponent.h>
 #include <Components/RigidBodyComponent.h>
 #include <Util/Easing.h>
 
 #include <Graphics/Buffer.h>
 #include <Graphics/Material.h>
+#include <Graphics/Shader.h>
 #include <Graphics/DiffuseShader.h>
 #include <Prefabs/Prefabs.h>
 
@@ -86,6 +88,12 @@ void ExampleApplication::onInitialized()
     Shader->loadTexture(sdlg::DiffuseShader<sdlg::vertex::PositionNormalUVVertex>::TextureIndex::Diffuse, "sample.jpg");
     Shader->registerEvents();
     Shader->linkShaders();
+
+    Node = Scene->getRootNode()->addChildNode();
+    Node->setName("Light");
+    auto Light = Node->createComponent<sg::sdl::components::Light>();
+    Light->setColor(glm::vec3(1.0f, 0.3f, 0.3f));
+    Light->setDirection(glm::normalize(CameraComponent->getLookDirection()));
 
     CurrentScene = Scene;
 }

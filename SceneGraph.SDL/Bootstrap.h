@@ -11,6 +11,7 @@ namespace sdl {
 	class Bootstrap
 	{
 	public:
+		virtual ~Bootstrap() {}
 		virtual void onInitializing(Application * Application) = 0;
 		virtual void onInitialized() = 0;
 		virtual void onTerminating() = 0;

@@ -16,6 +16,7 @@ uniform sampler2D bumpTexture;
 uniform vec4 ambientColor;
 uniform vec4 diffuseColor;
 uniform vec4 specularColor;
+uniform vec3 lightColor;
 
 uniform float shininess;
 
@@ -34,6 +35,6 @@ void main(void)
     vec3 ambient = texture(ambientTexture, fTexCoord).rgb * ambientColor.rgb;
     vec4 specular = Ks * specularColor;
 
-    //outColor = vec4(ambient + diffuse.rgb + specular.rgb, diffuse.a);
-    outColor = diffuse;
+    //outColor = vec4((ambient + diffuse.rgb + specular.rgb) * lightColor, diffuse.a);
+    outColor = Kd * diffuse * vec4(lightColor, 1.0);
 }
