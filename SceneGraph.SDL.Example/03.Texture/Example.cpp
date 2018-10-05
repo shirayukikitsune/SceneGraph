@@ -19,12 +19,10 @@ using kitsune::scenegraph::sdl::ExampleApplication;
 namespace sg = kitsune::scenegraph;
 namespace sdlg = kitsune::scenegraph::sdl::graphics;
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-kitsune::scenegraph::sdl::Bootstrap * AppBootstrap = new ExampleApplication;
-}
-}
+namespace kitsune::scenegraph::sdl {
+    std::unique_ptr<Bootstrap> GetApplicationInstance() {
+        return std::make_unique<ExampleApplication>();
+    }
 }
 
 ExampleApplication::ExampleApplication()
@@ -91,8 +89,8 @@ void ExampleApplication::onInitialized()
 
     Node = Scene->getRootNode()->addChildNode();
     Node->setName("Light");
-    auto Light = Node->createComponent<sg::sdl::components::Light>();
-    Light->setColor(glm::vec3(1.0f, 0.3f, 0.3f));
+    Light = Node->createComponent<sg::sdl::components::Light>();
+    Light->setColor(glm::vec3(1.0f, 0.8f, 0.8f));
     Light->setDirection(glm::normalize(CameraComponent->getLookDirection()));
 
     CurrentScene = Scene;
@@ -107,11 +105,11 @@ void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
 {
     currentTime += frameTime.count();
 
-    // We rotate the cubes a bit every frame
+    // We rotate the cube a bit every frame
     auto Nodes = CurrentScene->findNodesByTag("Cube");
     for (auto i = Nodes.first; i != Nodes.second; ++i) {
         if (auto Node = i->second.lock()) {
-            auto step = Node->getName().compare("Cube") == 0 ? 0.01f : Node->getName().compare("Moon") == 0 ? 0.02f : 0.002f;
+            auto step = 0.005f;
             auto rotation = Node->getLocalRotation();
             auto angles = glm::eulerAngles(rotation);
             angles.z += step;
@@ -120,7 +118,7 @@ void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
         }
     }
 
-    // With the first cube local rotation, the second cube will orbit around the first while also rotating itself
+    Light->setDirection(glm::quat(glm::vec3(0.1f, 0, 0)) * Light->getDirection());
 
     CurrentScene->update(frameTime.count());
 }

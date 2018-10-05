@@ -16,43 +16,38 @@ using kitsune::scenegraph::sdl::ExampleApplication;
 namespace sg = kitsune::scenegraph;
 namespace sdlg = kitsune::scenegraph::sdl::graphics;
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-kitsune::scenegraph::sdl::Bootstrap * AppBootstrap = new ExampleApplication;
-}
-}
+namespace kitsune::scenegraph::sdl {
+    std::unique_ptr<Bootstrap> GetApplicationInstance() {
+        return std::make_unique<ExampleApplication>();
+    }
 }
 
-ExampleApplication::ExampleApplication()
-{
+ExampleApplication::ExampleApplication() {
     Run = true;
     currentTime = 0;
 }
 
-void ExampleApplication::onInitializing(sg::sdl::Application * Application)
-{
+void ExampleApplication::onInitializing(sg::sdl::Application *Application) {
     _Application = Application;
     _Application->setWindowTitle("Scenegraph Example 01 - Bootstrap");
 }
 
-void ExampleApplication::onInitialized()
-{
-    _Application->getGraphics()->setClearColor(1.0f, 0, 0, 0);
+void ExampleApplication::onInitialized() {
+    _Application->getGraphics()->setClearColor(1.0f, 0, 1.0f, 0);
     _Application->getGraphics()->setVerticalSync(true);
 
     // All of these will make the application gracefully end:
     //  - Send a SIGTERM
     //  - Close the main window
     //  - Press the ESCAPE key
-    _Application->getEventHandler()->addHandler(sg::events::application::Quit, [this](void*) {
+    _Application->getEventHandler()->addHandler(sg::events::application::Quit, [this](void *) {
         this->Run = false;
     });
-    _Application->getEventHandler()->addHandler(sg::events::window::Close, [this](void*) {
+    _Application->getEventHandler()->addHandler(sg::events::window::Close, [this](void *) {
         this->Run = false;
     });
-    _Application->getEventHandler()->addHandler(sg::events::input::KeyUp, [this](void* data) {
-        SDL_KeyboardEvent *evData = reinterpret_cast<SDL_KeyboardEvent*>(data);
+    _Application->getEventHandler()->addHandler(sg::events::input::KeyUp, [this](void *data) {
+        auto evData = reinterpret_cast<SDL_KeyboardEvent *>(data);
         if (evData->keysym.sym == SDLK_ESCAPE) {
             this->Run = false;
         }
@@ -76,15 +71,13 @@ void ExampleApplication::onInitialized()
     CurrentScene = Scene;
 }
 
-void ExampleApplication::onTerminating()
-{
+void ExampleApplication::onTerminating() {
     CurrentScene.reset();
 }
 
-void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
-{
+void ExampleApplication::onUpdate(const std::chrono::milliseconds &frameTime) {
     currentTime += frameTime.count();
-    int f = (int)currentTime % 2000;
+    int f = (int) currentTime % 2000;
     float a = 0.0f;
 
     if (f < 500) {
@@ -98,23 +91,19 @@ void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
     CurrentScene->update(frameTime.count());
 }
 
-void ExampleApplication::onRender()
-{
+void ExampleApplication::onRender() {
     CurrentScene->render();
 }
 
-bool ExampleApplication::shouldRun()
-{
+bool ExampleApplication::shouldRun() {
     return Run;
 }
 
-int ExampleApplication::returnCode()
-{
+int ExampleApplication::returnCode() {
     return 0;
 }
 
-void ExampleApplication::getWindowDimensions(int &width, int &height)
-{
+void ExampleApplication::getWindowDimensions(int &width, int &height) {
     // Create a window covering all available desktop size on display 0.
     SDL_Rect bounds;
     if (SDL_GetDisplayUsableBounds(0, &bounds) == 0) {

@@ -39,8 +39,8 @@ void ModelLoaderFactory::load(std::shared_ptr<sg::Node> node, const std::string 
     auto loader = ModelLoaderFactory::loaders.find(extension);
 
     if (loader == ModelLoaderFactory::loaders.end()) {
-        throw std::domain_error::domain_error("unregistered loader");
+        throw std::domain_error("unregistered loader");
     }
 
-    return loader->second->load(node, stream);
+    return loader->second->load(node, stream, BufferAccess::Draw, BufferFrequency::Static, BufferAccess::Draw, BufferFrequency::Static);
 }

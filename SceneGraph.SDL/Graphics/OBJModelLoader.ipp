@@ -1,33 +1,45 @@
 #include "ModelLoader.h"
+#include "Material.h"
 #include "Vertex.h"
 
 #include <fstream>
 #include <regex>
 #include <sstream>
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-namespace graphics {
-namespace implementations {
+namespace kitsune::scenegraph::sdl::graphics::implementations {
 
 class OBJModelLoader : public ModelLoader {
+    typedef ArrayBuffer<unsigned int, 1> IBType;
+    typedef ArrayBuffer<vertex::PositionNormalUVVertex, 1> VBType;
+
 public:
-    void load(std::shared_ptr<Node> node, const std::string& filename) override {
+    void load(std::shared_ptr<Node> node,
+            const std::string& filename,
+            BufferAccess indexBufferAccess = BufferAccess::Draw,
+            BufferFrequency indexBufferFrequency = BufferFrequency::Static,
+            BufferAccess vertexBufferAccess = BufferAccess::Draw,
+            BufferFrequency vertexBufferFrequency = BufferFrequency::Static) override {
         std::ifstream filestream(filename, std::ios::in);
 
-        load(node, filestream);
+        load(node, filestream, indexBufferAccess, indexBufferFrequency, vertexBufferAccess, vertexBufferFrequency);
 
         filestream.close();
     }
 
-    void load(std::shared_ptr<Node> node, std::istream& stream) override {
+    void load(std::shared_ptr<Node> node,
+            std::istream& stream,
+            BufferAccess indexBufferAccess = BufferAccess::Draw,
+            BufferFrequency indexBufferFrequency = BufferFrequency::Static,
+            BufferAccess vertexBufferAccess = BufferAccess::Draw,
+            BufferFrequency vertexBufferFrequency = BufferFrequency::Static) override {
         auto model = node->createComponent<Model>();
+        auto material = node->createComponent<Material<vertex::PositionNormalUVVertex, unsigned int>>();
 
         std::vector<btVector3> positions;
         std::vector<btVector4> UVs;
         std::vector<btVector3> normals;
         std::vector<vertex::PositionNormalUVVertex> vertices;
+        std::vector<unsigned int> indices;
 
         std::string line, descriptor;
         float x, y, z;
@@ -62,15 +74,17 @@ public:
             else if (descriptor.compare("f") == 0) {
                 auto f = [&]() {
                     auto current = vertices.size();
+                    int faces = 0;
                     // Face: v1 v2 v3 | v1/t1 v2/t2 v3/t3 | v1/[t1]/n1 v2/[t2]/n2 v3/[t3]/n3
-                    for (int i = 0; i < 3; ++i) {
+                    while (true) {
                         ss >> descriptor;
                         std::smatch m;
                         std::regex_match(descriptor, m, faceRegex);
 
                         if (m.empty()) {
-                            return;
+                            break;
                         }
+                        faces++;
 
                         btVector3 p, n;
                         btVector4 t;
@@ -105,28 +119,41 @@ public:
                             t = UVs[UVs.size() - vt];
                         }
 
+                        // This formula should work with everything
+                        if (faces >= 3) {
+                            indices.emplace_back(current);
+                            indices.emplace_back(vertices.size() - 1);
+                            indices.emplace_back(vertices.size());
+                        }
                         vertices.emplace_back(p, n, t);
                     }
 
-                    // Calculate normal if needed
+                    // Calculate normals if needed
                     if (vertices[current].normal.isZero()) {
-                        auto p = vertices[current + 1].position - vertices[current].position;
-                        auto n = vertices[current + 2].position - vertices[current + 1].position;
+                        for (auto max = vertices.size(), i = current + 1; i < max - 1; ++i) {
+                            auto p = vertices[i].position - vertices[current].position;
+                            auto n = vertices[i + 1].position - vertices[i].position;
 
-                        vertices[current].normal = vertices[current + 1].normal = vertices[current + 2].normal = p.cross(n).normalized();
+                            vertices[i - 1].normal = vertices[i].normal = vertices[i + 1].normal = p.cross(n).normalized();
+                        }
                     }
                 };
 
                 f();
             }
+            // TODO: material -> set current vertices/indices to current material -> reset vectors
         }
-    
-        
+
+        // Now we have vertices and indices populated, add them to the material
+        material->beginSetup();
+
+        auto ib = std::unique_ptr<IBType>(new IBType(BufferTarget::Index));
+        ib->create(indices.data(), indices.size(), indexBufferFrequency, indexBufferAccess);
+        auto vb = std::unique_ptr<VBType>(new VBType(BufferTarget::Vertex));
+        vb->create(vertices.data(), vertices.size(), vertexBufferFrequency, vertexBufferAccess);
+
+        material->endSetup();
     }
 };
 
-}
-}
-}
-}
 }

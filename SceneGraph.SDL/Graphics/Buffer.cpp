@@ -1,9 +1,6 @@
 #include "Buffer.h"
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-namespace graphics {
+namespace kitsune::scenegraph::sdl::graphics {
 
 GLenum convertBufferTarget(BufferTarget target) {
     switch (target) {
@@ -30,8 +27,6 @@ GLenum convertBufferTarget(BufferTarget target) {
         case BufferTarget::TransformFeedback:
             return GL_TRANSFORM_FEEDBACK_BUFFER;
     }
-
-    return 0;
 }
 
 GLenum convertBufferFrequencyAndAccess(BufferFrequency frequency, BufferAccess access) {
@@ -64,11 +59,6 @@ GLenum convertBufferFrequencyAndAccess(BufferFrequency frequency, BufferAccess a
                     return GL_DYNAMIC_COPY;
             }
     }
-
-    return GL_STREAM_COPY;
 }
 
-}
-}
-}
 }

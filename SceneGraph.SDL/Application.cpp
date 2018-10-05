@@ -65,9 +65,11 @@ int main(int argc, char ** argv)
 {
     using namespace kitsune::scenegraph::sdl;
 
+    auto AppBootstrap = GetApplicationInstance();
+
     assert(AppBootstrap != nullptr && "AppBootstrap is not set");
 
-    Application * App = new Application(AppBootstrap);
+    auto App = new Application(AppBootstrap.get());
 
     AppBootstrap->onInitializing(App);
 
@@ -79,7 +81,6 @@ int main(int argc, char ** argv)
 
     AppBootstrap->onTerminating();
 
-    delete AppBootstrap;
     delete App;
 
     return retCode;

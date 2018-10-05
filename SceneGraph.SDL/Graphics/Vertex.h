@@ -3,11 +3,7 @@
 #include <LinearMath/btVector3.h>
 #include <glad/glad.h>
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-namespace graphics {
-namespace vertex {
+namespace kitsune::scenegraph::sdl::graphics::vertex {
 
     struct BaseVertex {
         static void bindAttributes() {};
@@ -49,8 +45,8 @@ namespace vertex {
 
     struct PositionNormalColorVertex : public BaseVertex
     {
-        PositionNormalColorVertex() {}
-        PositionNormalColorVertex(btVector3 _p, btVector3 _n, btVector4 _c) : position(_p), normal(_n), color(_c) {}
+        PositionNormalColorVertex() = default;
+        PositionNormalColorVertex(const btVector3 &_p, const btVector3 &_n, const btVector4 &_c) : position(_p), normal(_n), color(_c) {}
 
         btVector3 position;
         btVector3 normal;
@@ -74,8 +70,9 @@ namespace vertex {
 
     struct PositionNormalUVVertex : public BaseVertex
     {
-        PositionNormalUVVertex() {}
-        PositionNormalUVVertex(btVector3 _p, btVector3 _n, btVector4 _uv) : position(_p), normal(_n), uv(_uv) {}
+        PositionNormalUVVertex() = default;
+
+        PositionNormalUVVertex(const btVector3 &_p, const btVector3 &_n, const btVector4 &_uv) : position(_p), normal(_n), uv(_uv) {}
 
         btVector3 position;
         btVector3 normal;
@@ -98,8 +95,4 @@ namespace vertex {
         }
     };
 
-}
-}
-}
-}
 }

@@ -9,10 +9,7 @@
 #include <SOIL.h>
 #include <glm/gtc/matrix_inverse.hpp>
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-namespace graphics {
+namespace kitsune::scenegraph::sdl::graphics {
 
 template <class VertexType>
 class DiffuseShader : public Shader<VertexType>
@@ -36,12 +33,12 @@ public:
         ambientColor = diffuseColor = specularColor = 0;
     }
 
-    virtual void initialize() override
+    void initialize() override
     {
         Shader<VertexType>::initialize();
     }
 
-    virtual void cleanUp() override
+    void cleanUp() override
     {
         Shader<VertexType>::cleanUp();
 
@@ -67,12 +64,17 @@ public:
 protected:
     void setUniforms() override
     {
-        for (int i = 0; i < (int)TextureIndex::Count; ++i) {
+        int mask = 0;
+        for (unsigned int i = 0; i < (unsigned int)TextureIndex::Count; ++i) {
             glUniform1i(textureUniforms[i], i);
 
+            if (textures[i]) {
+                mask |= 1 << i;
+            }
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(GL_TEXTURE_2D, textures[i]);
         }
+        glUniform1i(textureMask, mask);
 
         auto node = Component::getNode();
         auto scene = Component::getScene();
@@ -83,7 +85,7 @@ protected:
         for (auto i = lights.first; i != lights.second; ++i) {
             if (auto lightNode = i->second.lock()) {
                 auto light = lightNode->template getComponent<components::Light>();
-                if (light) {
+                if (light && light->isActive()) {
                     glUniform3fv(lightColor, 1, &light->getColor()[0]);
                     glUniform3fv(lightDirection, 1, &light->getDirection()[0]);
                 }
@@ -107,6 +109,7 @@ protected:
         textureUniforms[(int)TextureIndex::SpecularColor] = glGetUniformLocation(shaderProgram, "specularColorTexture");
         textureUniforms[(int)TextureIndex::SpecularHighlight] = glGetUniformLocation(shaderProgram, "specularHighlightTexture");
         textureUniforms[(int)TextureIndex::Bump] = glGetUniformLocation(shaderProgram, "bumpTexture");
+        textureMask = glGetUniformLocation(shaderProgram, "textureMask");
 
         ambientColor = glGetUniformLocation(shaderProgram, "ambientColor");
         diffuseColor = glGetUniformLocation(shaderProgram, "diffuseColor");
@@ -123,6 +126,7 @@ protected:
 private:
     std::array<GLuint, (int)TextureIndex::Count> textures;
     std::array<GLint, (int)TextureIndex::Count> textureUniforms;
+    GLint textureMask;
 
     // Material parameters
     GLint ambientColor;
@@ -141,7 +145,4 @@ private:
     glm::mat4 normalMatrix;
 };
 
-}
-}
-}
 }

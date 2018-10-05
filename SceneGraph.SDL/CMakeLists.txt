@@ -14,6 +14,7 @@ set(HEADER_FILES
         Graphics/ModelLoaderFactory.h
         Graphics/OBJModelLoader.ipp
         Graphics/Shader.h
+        Graphics/Texture.h
         Graphics/Vertex.h
         Prefabs/Prefabs.h
     )

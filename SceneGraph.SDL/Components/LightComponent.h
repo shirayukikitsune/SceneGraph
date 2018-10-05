@@ -4,10 +4,7 @@
 
 #include <glm/glm.hpp>
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-namespace components {
+namespace kitsune::scenegraph::sdl::components {
 
 class Light : public Component {
     KIT_SG_COMPONENT(kitsune::scenegraph::sdl::components::Light);
@@ -51,7 +48,4 @@ protected:
     }
 };
 
-}
-}
-}
 }

@@ -1,3 +1,7 @@
+#include <memory>
+
+#include <memory>
+
 #include "Prefabs.h"
 
 #include "Graphics/Material.h"
@@ -19,10 +23,10 @@ void CreatePlane(std::shared_ptr<Node> node, bool addPhysics) {
     if (addPhysics) {
         // Enable physics for this plane (need to add a CollisionShapeComponent and a RigidBodyComponent)
         auto CollisionShape = node->createComponent<sg::CollisionShapeComponent>();
-        CollisionShape->setDimentions(btVector3(0, 1, 0));
+        CollisionShape->setDimensions(btVector3(0, 1, 0));
         CollisionShape->setShape(sg::CollisionShapeComponent::ShapeFormat::Plane);
         
-        auto RigidBody = node->createComponent<sg::RigidBodyComponent>(0.0f, sg::RigidBodyComponent::RigidBodyType::Static);
+        node->createComponent<sg::RigidBodyComponent>(0.0f, sg::RigidBodyComponent::RigidBodyType::Kinematic);
     }
 
     // Add the Plane Material
@@ -32,7 +36,7 @@ void CreatePlane(std::shared_ptr<Node> node, bool addPhysics) {
     // Create index buffer
     unsigned short planeIndices[] = { 0, 1, 2, 1, 3, 2 };
     typedef sdlg::ArrayBuffer<unsigned short, 1> IBType;
-    auto planeIndexBuffer = std::unique_ptr<IBType>(new IBType(sdlg::BufferTarget::Index));
+    auto planeIndexBuffer = std::make_unique<IBType>(sdlg::BufferTarget::Index);
     planeIndexBuffer->create(planeIndices, sizeof(planeIndices) / sizeof(planeIndices[0]), sdlg::BufferFrequency::Static, sdlg::BufferAccess::Draw);
 
     // Create vertex buffer
@@ -43,7 +47,7 @@ void CreatePlane(std::shared_ptr<Node> node, bool addPhysics) {
         sdlg::vertex::PositionNormalUVVertex(btVector3(-1, 1, 0), btVector3(0, 0, 1), btVector4(1, 0, 0, 0))
     };
     typedef sdlg::ArrayBuffer<sdlg::vertex::PositionNormalUVVertex, 1> VBType;
-    auto planeVertexBuffer = std::unique_ptr<VBType>(new VBType(sdlg::BufferTarget::Vertex));
+    auto planeVertexBuffer = std::make_unique<VBType>(sdlg::BufferTarget::Vertex);
     planeVertexBuffer->create(planeVertices, sizeof(planeVertices) / sizeof(planeVertices[0]), sdlg::BufferFrequency::Static, sdlg::BufferAccess::Draw);
 
     Material->endSetup();
@@ -53,12 +57,12 @@ void CreatePlane(std::shared_ptr<Node> node, bool addPhysics) {
 
 void CreateCube(std::shared_ptr<Node> node, bool addPhysics) {
     if (addPhysics) {
-        // Enable physics for this plane (need to add a CollisionShapeComponent and a RigidBodyComponent)
+        // Enable physics for this cube (need to add a CollisionShapeComponent and a RigidBodyComponent)
         auto CollisionShape = node->createComponent<sg::CollisionShapeComponent>();
-        CollisionShape->setDimentions(btVector3(0, 1, 0));
+        CollisionShape->setDimensions(btVector3(node->getLocalScale().x, node->getLocalScale().y, node->getLocalScale().z));
         CollisionShape->setShape(sg::CollisionShapeComponent::ShapeFormat::Box);
 
-        auto RigidBody = node->createComponent<sg::RigidBodyComponent>(0.0f, sg::RigidBodyComponent::RigidBodyType::Static);
+        node->createComponent<sg::RigidBodyComponent>(0.0f, sg::RigidBodyComponent::RigidBodyType::Kinematic);
     }
 
     // Add the Plane Material
@@ -75,7 +79,7 @@ void CreateCube(std::shared_ptr<Node> node, bool addPhysics) {
         22, 21, 20, 21, 22, 23,
     };
     typedef sdlg::ArrayBuffer<unsigned short, 1> IBType;
-    auto cubeIndexBuffer = std::unique_ptr<IBType>(new IBType(sdlg::BufferTarget::Index));
+    auto cubeIndexBuffer = std::make_unique<IBType>(sdlg::BufferTarget::Index);
     cubeIndexBuffer->create(cubeIndices, sizeof(cubeIndices) / sizeof(cubeIndices[0]), sdlg::BufferFrequency::Static, sdlg::BufferAccess::Draw);
 
     // Create vertex buffer
@@ -111,7 +115,7 @@ void CreateCube(std::shared_ptr<Node> node, bool addPhysics) {
         sdlg::vertex::PositionNormalUVVertex(btVector3(-0.5f, 0.5f, 0.5f), btVector3(0, 1, 0), btVector4(2.0f / 3.0f, 1.0f, 0, 0))
     };
     typedef sdlg::ArrayBuffer<sdlg::vertex::PositionNormalUVVertex, 1> VBType;
-    auto cubeVertexBuffer = std::unique_ptr<VBType>(new VBType(sdlg::BufferTarget::Vertex));
+    auto cubeVertexBuffer = std::make_unique<VBType>(sdlg::BufferTarget::Vertex);
     cubeVertexBuffer->create(cubeVertices, sizeof(cubeVertices) / sizeof(cubeVertices[0]), sdlg::BufferFrequency::Static, sdlg::BufferAccess::Draw);
 
     Material->endSetup();

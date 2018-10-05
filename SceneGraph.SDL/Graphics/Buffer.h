@@ -4,10 +4,7 @@
 #include <array>
 #include <vector>
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-namespace graphics {
+namespace kitsune::scenegraph::sdl::graphics {
 
     enum struct BufferFrequency {
         ///! The buffer contents will be used a few times and modified only once
@@ -47,15 +44,15 @@ namespace graphics {
 
     template <typename DataType, int bufferCount>
     class ArrayBuffer {
-        // Disable buffer copy
-        ArrayBuffer(const ArrayBuffer&) = delete;
-        ArrayBuffer& operator= (const ArrayBuffer&) = delete;
-
         std::array<GLuint, bufferCount> bufferId;
 
         std::array<std::vector<DataType>, bufferCount> cpuBuffer;
 
     public:
+        // Disable buffer copy
+        ArrayBuffer(const ArrayBuffer&) = delete;
+        ArrayBuffer& operator= (const ArrayBuffer&) = delete;
+
         ///! Initializes an empty buffer
         explicit ArrayBuffer() {
             bufferId.fill(0);
@@ -85,10 +82,6 @@ namespace graphics {
 
     template <typename DataType>
     class ArrayBuffer<DataType, 1> {
-        // Disable buffer copy
-        ArrayBuffer(const ArrayBuffer&) = delete;
-        ArrayBuffer& operator= (const ArrayBuffer&) = delete;
-
         GLuint bufferId;
 
         std::vector<DataType> cpuBuffer;
@@ -96,6 +89,10 @@ namespace graphics {
         BufferTarget target;
 
     public:
+        // Disable buffer copy
+        ArrayBuffer(const ArrayBuffer&) = delete;
+        ArrayBuffer& operator= (const ArrayBuffer&) = delete;
+
         ///! Initializes an empty buffer
         explicit ArrayBuffer(BufferTarget target)
             : target(target)
@@ -136,7 +133,4 @@ namespace graphics {
         GLuint getGpuBuffer() { return bufferId; }
     };
 
-}
-}
-}
 }

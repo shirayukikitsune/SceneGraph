@@ -4,10 +4,7 @@
 
 #include <glm/glm.hpp>
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-namespace components {
+namespace kitsune::scenegraph::sdl::components {
 
 class Camera : public Component {
     KIT_SG_COMPONENT(kitsune::scenegraph::sdl::components::Camera);
@@ -28,7 +25,4 @@ protected:
     void onNodeSet() override;
 };
 
-}
-}
-}
 }

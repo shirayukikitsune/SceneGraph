@@ -4,6 +4,7 @@
 #include <Application.h>
 // From SceneGraph
 #include <Base/Scene.h>
+#include <Components/LightComponent.h>
 
 #include <memory>
 
@@ -31,6 +32,7 @@ namespace sdl {
     private:
         std::shared_ptr<Scene> CurrentScene;
 		std::shared_ptr<Node> Camera;
+		components::Light *Light;
         Application *_Application;
 
         bool Run;

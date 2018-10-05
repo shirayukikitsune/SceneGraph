@@ -7,7 +7,7 @@ using kitsune::scenegraph::sdl::Graphics;
 
 Graphics::Graphics(int Width, int Height)
 {
-    SDL_GL_LoadLibrary(NULL);
+    SDL_GL_LoadLibrary(nullptr);
 
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     // Set OpenGL Core profile
@@ -21,12 +21,12 @@ Graphics::Graphics(int Width, int Height)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
-    this->Window = SDL_CreateWindow("", 0, 0, Width, Height, SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
+    Window = SDL_CreateWindow("", 0, 0, Width, Height, SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
     if (!Window) {
         throw Graphics::Exception(SDL_GetError());
     }
 
-    this->Context = SDL_GL_CreateContext(this->Window);
+    Context = SDL_GL_CreateContext(Window);
     if (!Context) {
         throw Graphics::Exception(SDL_GetError());
     }
@@ -47,12 +47,12 @@ Graphics::Graphics(int Width, int Height)
 
 Graphics::~Graphics()
 {
-    if (this->Context) {
-        SDL_GL_DeleteContext(this->Context);
+    if (Context) {
+        SDL_GL_DeleteContext(Context);
     }
 
-    if (this->Window) {
-        SDL_DestroyWindow(this->Window);
+    if (Window) {
+        SDL_DestroyWindow(Window);
     }
 }
 
@@ -68,7 +68,7 @@ void Graphics::clear()
 
 void Graphics::present()
 {
-    SDL_GL_SwapWindow(this->Window);
+    SDL_GL_SwapWindow(Window);
 }
 
 void Graphics::setVerticalSync(bool enabled)
@@ -84,5 +84,5 @@ void Graphics::setVerticalSync(bool enabled)
 
 void Graphics::setWindowTitle(const char * Title)
 {
-    SDL_SetWindowTitle(this->Window, Title);
+    SDL_SetWindowTitle(Window, Title);
 }

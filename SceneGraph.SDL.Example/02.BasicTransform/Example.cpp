@@ -17,12 +17,10 @@ using kitsune::scenegraph::sdl::ExampleApplication;
 namespace sg = kitsune::scenegraph;
 namespace sdlg = kitsune::scenegraph::sdl::graphics;
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-kitsune::scenegraph::sdl::Bootstrap * AppBootstrap = new ExampleApplication;
-}
-}
+namespace kitsune::scenegraph::sdl {
+    std::unique_ptr<Bootstrap> GetApplicationInstance() {
+        return std::make_unique<ExampleApplication>();
+    }
 }
 
 ExampleApplication::ExampleApplication()
@@ -53,7 +51,7 @@ void ExampleApplication::onInitialized()
         this->Run = false;
     });
     _Application->getEventHandler()->addHandler(sg::events::input::KeyUp, [this](void* data) {
-        SDL_KeyboardEvent *evData = reinterpret_cast<SDL_KeyboardEvent*>(data);
+        auto evData = reinterpret_cast<SDL_KeyboardEvent*>(data);
         if (evData->keysym.sym == SDLK_ESCAPE) {
             this->Run = false;
         }
@@ -119,7 +117,7 @@ void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
     auto Nodes = CurrentScene->findNodesByTag("Cube");
     for (auto i = Nodes.first; i != Nodes.second; ++i) {
         if (auto Node = i->second.lock()) {
-            auto step = Node->getName().compare("Cube") == 0 ? 0.01f : Node->getName().compare("Moon") == 0 ? 0.02f : 0.002f;
+            auto step = Node->getName() == "Cube" ? 0.01f : Node->getName() == "Moon" ? 0.02f : 0.002f;
             auto rotation = Node->getLocalRotation();
             auto angles = glm::eulerAngles(rotation);
             angles.z += step;

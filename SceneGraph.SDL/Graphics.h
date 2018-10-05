@@ -2,23 +2,23 @@
 
 #include <exception>
 #include <string>
+
 #ifdef WIN32
 #include <Windows.h>
 #endif
+
 #include <SDL2/SDL.h>
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-    
+namespace kitsune::scenegraph::sdl {
+
     class Graphics {
     public:
         class Exception : public std::exception {
         public:
             explicit Exception(const char *error)
-                : error(error) {}
+                    : error(error) {}
 
-            const char * what() const noexcept {
+            const char *what() const noexcept {
                 return error.c_str();
             }
 
@@ -27,10 +27,13 @@ namespace sdl {
         };
 
         Graphics(int Width, int Height);
+
         ~Graphics();
 
         void setClearColor(float a, float r, float g, float b);
+
         void clear();
+
         void present();
 
         /**
@@ -41,15 +44,13 @@ namespace sdl {
          */
         void setVerticalSync(bool enabled);
 
-        void setWindowTitle(const char * Title);
+        void setWindowTitle(const char *Title);
 
         SDL_GLContext getContext() const { return Context; }
 
     private:
-		SDL_Window* Window;
+        SDL_Window *Window;
         SDL_GLContext Context;
     };
 
-}
-}
 }

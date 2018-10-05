@@ -9,10 +9,7 @@
 #include <type_traits>
 #include <glad/glad.h>
 
-namespace kitsune {
-namespace scenegraph {
-namespace sdl {
-namespace graphics {
+namespace kitsune::scenegraph::sdl::graphics {
 
     template <class VertexType, class IndexType = unsigned int>
     class Material : public Component
@@ -112,7 +109,4 @@ namespace graphics {
         float shininess;
     };
 
-}
-}
-}
 }
