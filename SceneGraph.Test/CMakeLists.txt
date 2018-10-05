@@ -1,3 +1,5 @@
+add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
+
 add_executable(scenegraph-test-component componenttest.cpp)
 target_include_directories(scenegraph-test-component PUBLIC ../SceneGraph ${Boost_INCLUDE_DIR})
 target_link_libraries(scenegraph-test-component LINK_PUBLIC ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} scenegraph)

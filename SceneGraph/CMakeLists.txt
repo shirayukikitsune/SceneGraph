@@ -31,6 +31,8 @@ add_library(scenegraph
         Util/Util.cpp
     )
 
+add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
+
 target_include_directories(scenegraph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${GLM_INCLUDE_DIR})
 target_link_libraries(scenegraph LINK_INTERFACE_LIBRARIES ${BULLET_LIBRARIES})
 
