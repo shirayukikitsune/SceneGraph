@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(NodeTransform)
 	auto RootNode = Scene->getRootNode();
 	glm::vec3 translation(1.0f, 0, 0);
 	glm::quat rotation(0, 1.0f, 0, kitsune::scenegraph::util::PI_2);
-	glm::mat4 testTransform = glm::translate(glm::mat4(), translation) * glm::toMat4(rotation);
+	glm::mat4 testTransform = glm::translate(glm::mat4(1.0f), translation) * glm::toMat4(rotation);
 
 	BOOST_TEST((RootNode != nullptr), "Scene without root node");
 
@@ -69,8 +69,8 @@ BOOST_AUTO_TEST_CASE(NodeTransform)
 
 	RootNode->resetTransform();
 
-	BOOST_TEST((RootNode->getLocalTransform() == glm::mat4()), "Root node with non-identity local transform");
-	BOOST_TEST((RootNode->getWorldTransform() == glm::mat4()), "Root node with non-identity world transform");
+	BOOST_TEST((RootNode->getLocalTransform() == glm::mat4(1.0f)), "Root node with non-identity local transform");
+	BOOST_TEST((RootNode->getWorldTransform() == glm::mat4(1.0f)), "Root node with non-identity world transform");
 
 	RootNode->setWorldTransform(testTransform);
 
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(NodeTransformPropagation)
 	auto RootNode = Scene->getRootNode();
 	glm::vec3 translation(1.0f, 0, 0);
 	glm::quat rotation = glm::angleAxis(kitsune::scenegraph::util::PI_2, glm::vec3(0, 1.0f, 0));
-	glm::mat4 testTransform = glm::translate(glm::mat4(), translation) * glm::toMat4(rotation);
+	glm::mat4 testTransform = glm::translate(glm::mat4(1.0f), translation) * glm::toMat4(rotation);
 
 	BOOST_TEST((RootNode != nullptr), "Scene without root node");
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(NodeTransformPropagation)
 	BOOST_TEST((fabsf(rotation.z - worldRotation.z) <= 1e-5f), "Invalid world rotation");
 	BOOST_TEST((fabsf(rotation.w - worldRotation.w) <= 1e-5f), "Invalid world rotation");
 
-	BOOST_TEST((SecondChild->getLocalTransform() == glm::mat4()), "Invalid local transform");
+	BOOST_TEST((SecondChild->getLocalTransform() == glm::mat4(1.0f)), "Invalid local transform");
 
 	glm::mat4 testInverse = glm::affineInverse(testTransform);
 	glm::mat4 toOrigin = SecondChild->getTransformToOrigin();
@@ -115,9 +115,9 @@ BOOST_AUTO_TEST_CASE(NodeTransformPropagation)
 
 	ChildNode->resetTransform();
 
-	BOOST_TEST((SecondChild->getWorldTransform() == glm::mat4()), "Invalid world rotation");
+	BOOST_TEST((SecondChild->getWorldTransform() == glm::mat4(1.0f)), "Invalid world rotation");
 
-	BOOST_TEST((SecondChild->getTransformToOrigin() == glm::mat4()), "Invalid transform to origin");
+	BOOST_TEST((SecondChild->getTransformToOrigin() == glm::mat4(1.0f)), "Invalid transform to origin");
 }
 
 BOOST_AUTO_TEST_CASE(NodeActive)
