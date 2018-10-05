@@ -18,6 +18,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+cmake-build-*/
 
 # Roslyn cache directories
 *.ide/
@@ -237,3 +238,5 @@ $RECYCLE.BIN/
 /SceneGraph.VC.db
 /CMakeSettings.json
 /CppProperties.json
+
+.idea
