@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "CollisionShapeComponent.h"
 
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
@@ -15,53 +17,48 @@ using kitsune::scenegraph::CollisionShapeComponent;
 namespace sg = kitsune::scenegraph;
 
 CollisionShapeComponent::CollisionShapeComponent()
-    : PlaneConstant(0.0f), Dimentions(btVector3(0, 0, 0))
-{
-	CollisionShape.reset(new btEmptyShape);
+        : PlaneConstant(0.0f), Dimensions(btVector3(0, 0, 0)) {
+    Shape = ShapeFormat::Null;
+    CollisionShape = std::make_unique<btEmptyShape>();
 }
 
-CollisionShapeComponent::~CollisionShapeComponent()
-{
-}
+void CollisionShapeComponent::setShape(ShapeFormat Shape) {
+    Shape = Shape;
 
-void CollisionShapeComponent::setShape(ShapeFormat Shape)
-{
-	this->Shape = Shape;
-
-	switch (Shape) {
-	case ShapeFormat::Box:
-		CollisionShape.reset(new btBoxShape(getDimentions()));
-		break;
-	case ShapeFormat::Capsule:
-		CollisionShape.reset(new btCapsuleShape(getDimentions().x(), getDimentions().y()));
-		break;
-	case ShapeFormat::Cone:
-		CollisionShape.reset(new btConeShape(getDimentions().x(), getDimentions().y()));
-		break;
-	case ShapeFormat::Cylinder:
-		CollisionShape.reset(new btCylinderShape(getDimentions()));
-		break;
-	case ShapeFormat::Plane:
-		CollisionShape.reset(new btStaticPlaneShape(getDimentions(), getPlaneConstant()));
-		break;
-	case ShapeFormat::Sphere:
-		CollisionShape.reset(new btSphereShape(getDimentions().x()));
-		break;
-	case ShapeFormat::StaticTriangleMesh:
-		//CollisionShape.reset(new btBvhTriangleMeshShape(mesh, true, true));
-		//break;
-	case ShapeFormat::TriangleMesh:
-	case ShapeFormat::OptimizedTriangleMesh:
-	/*{
-		btConvexShape * originalShape;
-		btShapeHull * hull = new btShapeHull(originalShape);
-		btScalar margin = originalShape->getMargin();
-		hull->buildHull(margin);
-		CollisionShape.reset(new btConvexHullShape(reinterpret_cast<const btScalar*>(hull->getVertexPointer()), hull->numVertices()));
-		break;
-	}*/
-	case ShapeFormat::Null:
-		CollisionShape.reset(new btEmptyShape);
-		break;
-	}
+    switch (Shape) {
+        case ShapeFormat::Box:
+            CollisionShape = std::make_unique<btBoxShape>(getDimensions());
+            break;
+        case ShapeFormat::Capsule:
+            CollisionShape = std::make_unique<btCapsuleShape>(getDimensions().x(), getDimensions().y());
+            break;
+        case ShapeFormat::Cone:
+            CollisionShape = std::make_unique<btConeShape>(getDimensions().x(), getDimensions().y());
+            break;
+        case ShapeFormat::Cylinder:
+            CollisionShape = std::make_unique<btCylinderShape>(getDimensions());
+            break;
+        case ShapeFormat::Plane:
+            CollisionShape = std::make_unique<btStaticPlaneShape>(getDimensions(), getPlaneConstant());
+            break;
+        case ShapeFormat::Sphere:
+            CollisionShape = std::make_unique<btSphereShape>(getDimensions().x());
+            break;
+        case ShapeFormat::StaticTriangleMesh:
+            //CollisionShape.reset(new btBvhTriangleMeshShape(mesh, true, true));
+            //break;
+        case ShapeFormat::TriangleMesh:
+        case ShapeFormat::OptimizedTriangleMesh:
+            /*{
+                btConvexShape * originalShape;
+                btShapeHull * hull = new btShapeHull(originalShape);
+                btScalar margin = originalShape->getMargin();
+                hull->buildHull(margin);
+                CollisionShape.reset(new btConvexHullShape(reinterpret_cast<const btScalar*>(hull->getVertexPointer()), hull->numVertices()));
+                break;
+            }*/
+        case ShapeFormat::Null:
+            CollisionShape = std::make_unique<btEmptyShape>();
+            break;
+    }
 }

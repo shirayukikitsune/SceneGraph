@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "ConstraintComponent.h"
 
 #include "RigidBodyComponent.h"
@@ -14,165 +16,179 @@
 
 using kitsune::scenegraph::ConstraintComponent;
 
-ConstraintComponent::ConstraintComponent()
-{
+void ConstraintComponent::setConstraintType(ConstraintType Type) {
+    this->Type = Type;
+
+    createConstraint();
 }
 
-ConstraintComponent::~ConstraintComponent()
-{
+void ConstraintComponent::setAssociatedNode(std::weak_ptr<kitsune::scenegraph::Node> AssociatedNode) {
+    auto associated = AssociatedNode.lock();
+    if (!associated) {
+        return;
+    }
+
+    associatedNodeComponentAddedListener = associated->addComponentAddedEvent(
+            std::bind(&ConstraintComponent::onNodeAddComponent, this, std::placeholders::_1));
+    associatedNodeComponentRemovedListener = associated->addComponentRemovedEvent(
+            std::bind(&ConstraintComponent::onNodeRemoveComponent, this, std::placeholders::_1));
+
+    createConstraint();
 }
 
-void ConstraintComponent::setConstraintType(ConstraintType Type)
-{
-	this->Type = Type;
+void ConstraintComponent::setSpringActivation(int DoF, bool SpringActivation) {
+    setConstraintLimits();
 
-	createConstraint();
+    assert("Invalid DoF" && DoF >= 0 && DoF <= 5);
+
+    this->SpringActivation[DoF] = SpringActivation;
 }
 
-void ConstraintComponent::setAssociatedNode(std::weak_ptr<kitsune::scenegraph::Node> AssociatedNode)
-{
-	auto associated = AssociatedNode.lock();
-	if (!associated)
-		return;
+void ConstraintComponent::setSpringConstant(int DoF, float SpringConstant) {
+    setConstraintLimits();
 
-	associatedNodeComponentAddedListener = associated->addComponentAddedEvent(std::bind(&ConstraintComponent::onNodeAddComponent, this, std::placeholders::_1));
-	associatedNodeComponentRemovedListener = associated->addComponentRemovedEvent(std::bind(&ConstraintComponent::onNodeRemoveComponent, this, std::placeholders::_1));
+    assert("Invalid DoF" && DoF >= 0 && DoF <= 5);
 
-	createConstraint();
+    this->SpringConstants[DoF] = SpringConstant;
 }
 
-void ConstraintComponent::setSpringActivation(int DoF, bool SpringActivation)
-{
-	setConstraintLimits();
+void ConstraintComponent::createConstraint() {
+    auto node = getNode();
+    auto associated = AssociatedNode.lock();
 
-	assert("Invalid DoF" && DoF >= 0 && DoF <= 5);
+    assert("Constraint not associated" && (!associated || !node));
+    assert("Constraint associated nodes with no rigid body" &&
+           (!associated->hasComponent<RigidBodyComponent>() || !node->hasComponent<RigidBodyComponent>()));
 
-	this->SpringActivation[DoF] = SpringActivation;
+    btTransform frameFromB = getOffsetFromNode().inverseTimes(btTransform(
+            btQuaternion(associated->getLocalRotation().x, associated->getLocalRotation().y,
+                         associated->getLocalRotation().z, associated->getLocalRotation().w),
+            btVector3(associated->getLocalOffset().x, associated->getLocalOffset().y, associated->getLocalOffset().z)));
+
+    switch (Type) {
+        case ConstraintType::PointToPoint:
+            Constraint = std::make_unique<btPoint2PointConstraint>(
+                    *node->getComponent<RigidBodyComponent>()->RigidBody,
+                    *associated->getComponent<RigidBodyComponent>()->RigidBody,
+                    getOffsetFromNode().getOrigin(),
+                    frameFromB.getOrigin());
+            break;
+        case ConstraintType::Hinge:
+            Constraint = std::make_unique<btHingeConstraint>(
+                    *node->getComponent<RigidBodyComponent>()->RigidBody,
+                    *associated->getComponent<RigidBodyComponent>()->RigidBody,
+                    getOffsetFromNode(),
+                    frameFromB);
+            break;
+        case ConstraintType::Slider:
+            Constraint = std::make_unique<btSliderConstraint>(
+                    *node->getComponent<RigidBodyComponent>()->RigidBody,
+                    *associated->getComponent<RigidBodyComponent>()->RigidBody,
+                    getOffsetFromNode(),
+                    frameFromB,
+                    true);
+            break;
+        case ConstraintType::ConeTwist:
+            Constraint = std::make_unique<btConeTwistConstraint>(
+                    *node->getComponent<RigidBodyComponent>()->RigidBody,
+                    *associated->getComponent<RigidBodyComponent>()->RigidBody,
+                    getOffsetFromNode(),
+                    frameFromB);
+            break;
+        case ConstraintType::Generic6DoF:
+            Constraint = std::make_unique<btGeneric6DofConstraint>(
+                    *node->getComponent<RigidBodyComponent>()->RigidBody,
+                    *associated->getComponent<RigidBodyComponent>()->RigidBody,
+                    getOffsetFromNode(),
+                    frameFromB,
+                    true);
+            break;
+        case ConstraintType::Generic6DoFSpring:
+            Constraint = std::make_unique<btGeneric6DofSpring2Constraint>(
+                    *node->getComponent<RigidBodyComponent>()->RigidBody,
+                    *associated->getComponent<RigidBodyComponent>()->RigidBody,
+                    getOffsetFromNode(),
+                    frameFromB);
+            break;
+        case ConstraintType::Fixed:
+            Constraint = std::make_unique<btFixedConstraint>(
+                    *node->getComponent<RigidBodyComponent>()->RigidBody,
+                    *associated->getComponent<RigidBodyComponent>()->RigidBody,
+                    getOffsetFromNode(),
+                    frameFromB);
+            break;
+    }
+
+    setConstraintLimits();
 }
 
-void ConstraintComponent::setSpringConstant(int DoF, float SpringConstant)
-{
-	setConstraintLimits();
-	
-	assert("Invalid DoF" && DoF >= 0 && DoF <= 5);
+void ConstraintComponent::setConstraintLimits() {
+    switch (Type) {
+        case ConstraintType::ConeTwist: {
+            auto Constraint = dynamic_cast<btConeTwistConstraint *>(this->Constraint.get());
+            break;
+        }
+        case ConstraintType::Generic6DoF: {
+            auto Constraint = dynamic_cast<btGeneric6DofConstraint *>(this->Constraint.get());
 
-	this->SpringConstants[DoF] = SpringConstant;
+            Constraint->setAngularLowerLimit(getLowerAngularLimit());
+            Constraint->setAngularUpperLimit(getUpperAngularLimit());
+            Constraint->setLinearLowerLimit(getLowerLinearLimit());
+            Constraint->setLinearUpperLimit(getUpperLinearLimit());
+
+            break;
+        }
+        case ConstraintType::Generic6DoFSpring: {
+            auto Constraint = dynamic_cast<btGeneric6DofSpring2Constraint *>(this->Constraint.get());
+
+            Constraint->setAngularLowerLimit(getLowerAngularLimit());
+            Constraint->setAngularUpperLimit(getUpperAngularLimit());
+            Constraint->setLinearLowerLimit(getLowerLinearLimit());
+            Constraint->setLinearUpperLimit(getUpperLinearLimit());
+
+            for (int i = 0; i < 6; ++i) {
+                Constraint->enableSpring(i, getSpringActivation(i));
+                Constraint->setStiffness(i, getSpringConstant(i));
+            }
+
+            break;
+        }
+        case ConstraintType::Hinge: {
+            auto Constraint = dynamic_cast<btHingeConstraint *>(this->Constraint.get());
+
+            Constraint->setLimit(getLowerAngularLimit().x(), getUpperAngularLimit().x());
+
+            break;
+        }
+        default:
+            return;
+    }
 }
 
-void ConstraintComponent::createConstraint()
-{
-	auto node = getNode();
-	auto associated = AssociatedNode.lock();
+void ConstraintComponent::onNodeAddComponent(Component *Component) {
+    if (Component->getComponentNameHash() != RigidBodyComponent::componentNameHash)
+        return;
 
-	assert("Constraint not associated" && (!associated || !node));
-	assert("Constraint associated nodes with no rigid body" && (!associated->hasComponent<RigidBodyComponent>() || !node->hasComponent<RigidBodyComponent>()));
-
-	btTransform frameFromB = getOffsetFromNode().inverseTimes(btTransform(btQuaternion(associated->getLocalRotation().x, associated->getLocalRotation().y, associated->getLocalRotation().z, associated->getLocalRotation().w), btVector3(associated->getLocalOffset().x, associated->getLocalOffset().y, associated->getLocalOffset().z)));
-
-	switch (Type)
-	{
-	case ConstraintType::PointToPoint:
-		this->Constraint.reset(new btPoint2PointConstraint(*node->getComponent<RigidBodyComponent>()->RigidBody.get(), *associated->getComponent<RigidBodyComponent>()->RigidBody.get(), getOffsetFromNode().getOrigin(), frameFromB.getOrigin()));
-		break;
-	case ConstraintType::Hinge:
-		this->Constraint.reset(new btHingeConstraint(*node->getComponent<RigidBodyComponent>()->RigidBody.get(), *associated->getComponent<RigidBodyComponent>()->RigidBody.get(), getOffsetFromNode(), frameFromB));
-		break;
-	case ConstraintType::Slider:
-		this->Constraint.reset(new btSliderConstraint(*node->getComponent<RigidBodyComponent>()->RigidBody.get(), *associated->getComponent<RigidBodyComponent>()->RigidBody.get(), getOffsetFromNode(), frameFromB, true));
-		break;
-	case ConstraintType::ConeTwist:
-		Constraint.reset(new btConeTwistConstraint(*node->getComponent<RigidBodyComponent>()->RigidBody.get(), *associated->getComponent<RigidBodyComponent>()->RigidBody.get(), getOffsetFromNode(), frameFromB));
-		break;
-	case ConstraintType::Generic6DoF:
-		this->Constraint.reset(new btGeneric6DofConstraint(*node->getComponent<RigidBodyComponent>()->RigidBody.get(), *associated->getComponent<RigidBodyComponent>()->RigidBody.get(), getOffsetFromNode(), frameFromB, true));
-		break;
-	case ConstraintType::Generic6DoFSpring:
-		this->Constraint.reset(new btGeneric6DofSpring2Constraint(*node->getComponent<RigidBodyComponent>()->RigidBody.get(), *associated->getComponent<RigidBodyComponent>()->RigidBody.get(), getOffsetFromNode(), frameFromB));
-		break;
-	case ConstraintType::Fixed:
-		this->Constraint.reset(new btFixedConstraint(*node->getComponent<RigidBodyComponent>()->RigidBody.get(), *associated->getComponent<RigidBodyComponent>()->RigidBody.get(), getOffsetFromNode(), frameFromB));
-		break;
-	default:
-		return;
-	}
-
-	setConstraintLimits();
+    createConstraint();
 }
 
-void ConstraintComponent::setConstraintLimits()
-{
-	switch (Type)
-	{
-	case ConstraintType::ConeTwist:
-	{
-		auto Constraint = static_cast<btConeTwistConstraint*>(this->Constraint.get());
-		break;
-	}
-	case ConstraintType::Generic6DoF:
-	{
-		auto Constraint = static_cast<btGeneric6DofConstraint*>(this->Constraint.get());
+void ConstraintComponent::onNodeRemoveComponent(Component *Component) {
+    if (Component->getComponentNameHash() != RigidBodyComponent::componentNameHash)
+        return;
 
-		Constraint->setAngularLowerLimit(getLowerAngularLimit());
-		Constraint->setAngularUpperLimit(getUpperAngularLimit());
-		Constraint->setLinearLowerLimit(getLowerLinearLimit());
-		Constraint->setLinearUpperLimit(getUpperLinearLimit());
-
-		break;
-	}
-	case ConstraintType::Generic6DoFSpring:
-	{
-		auto Constraint = static_cast<btGeneric6DofSpring2Constraint*>(this->Constraint.get());
-
-		Constraint->setAngularLowerLimit(getLowerAngularLimit());
-		Constraint->setAngularUpperLimit(getUpperAngularLimit());
-		Constraint->setLinearLowerLimit(getLowerLinearLimit());
-		Constraint->setLinearUpperLimit(getUpperLinearLimit());
-
-		for (int i = 0; i < 6; ++i) {
-			Constraint->enableSpring(i, getSpringActivation(i));
-			Constraint->setStiffness(i, getSpringConstant(i));
-		}
-
-		break;
-	}
-	case ConstraintType::Hinge:
-	{
-		auto Constraint = static_cast<btHingeConstraint*>(this->Constraint.get());
-
-		Constraint->setLimit(getLowerAngularLimit().x(), getUpperAngularLimit().x());
-
-		break;
-	}
-	default:
-		return;
-	}
+    Constraint.reset();
 }
 
-void ConstraintComponent::onNodeAddComponent(Component * Component)
-{
-	if (Component->getComponentNameHash() != RigidBodyComponent::componentNameHash)
-		return;
+void ConstraintComponent::onNodeSet() {
+    auto node = getNode();
 
-	createConstraint();
-}
+    if (!node)
+        return;
 
-void ConstraintComponent::onNodeRemoveComponent(Component * Component)
-{
-	if (Component->getComponentNameHash() != RigidBodyComponent::componentNameHash)
-		return;
+    nodeComponentAddedListener = node->addComponentAddedEvent(
+            std::bind(&ConstraintComponent::onNodeAddComponent, this, std::placeholders::_1));
+    nodeComponentRemovedListener = node->addComponentRemovedEvent(
+            std::bind(&ConstraintComponent::onNodeRemoveComponent, this, std::placeholders::_1));
 
-	Constraint.reset();
-}
-
-void ConstraintComponent::onNodeSet()
-{
-	auto node = getNode();
-
-	if (!node)
-		return;
-
-	nodeComponentAddedListener = node->addComponentAddedEvent(std::bind(&ConstraintComponent::onNodeAddComponent, this, std::placeholders::_1));
-	nodeComponentRemovedListener = node->addComponentRemovedEvent(std::bind(&ConstraintComponent::onNodeRemoveComponent, this, std::placeholders::_1));
-
-	createConstraint();
+    createConstraint();
 }

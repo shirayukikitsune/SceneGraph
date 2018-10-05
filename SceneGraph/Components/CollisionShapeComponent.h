@@ -4,51 +4,50 @@
 
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
 
-namespace kitsune {
-namespace scenegraph {
+namespace kitsune::scenegraph {
 
-	class CollisionShapeComponent :
-		public Component
-	{
-        KIT_SG_COMPONENT(kitsune::scenegraph::CollisionShapeComponent)
+    class CollisionShapeComponent :
+            public Component {
+    KIT_SG_COMPONENT(kitsune::scenegraph::CollisionShapeComponent)
 
-	public:
-		enum class ShapeFormat {
-			Box,
-			Capsule,
-			Cone,
-			Cylinder,
-			Plane,
-			Sphere,
-			StaticTriangleMesh, // TODO: implement this
-			OptimizedTriangleMesh, // TODO: implement this
-			TriangleMesh, // TODO: implement this
-			Null,
-		};
+    public:
+        enum class ShapeFormat {
+            Box,
+            Capsule,
+            Cone,
+            Cylinder,
+            Plane,
+            Sphere,
+            StaticTriangleMesh, // TODO: implement this
+            OptimizedTriangleMesh, // TODO: implement this
+            TriangleMesh, // TODO: implement this
+            Null,
+        };
 
-		CollisionShapeComponent();
-		virtual ~CollisionShapeComponent();
+        CollisionShapeComponent();
 
-		btCollisionShape* getCollisionShape() { return CollisionShape.get(); }
+        btCollisionShape *getCollisionShape() { return CollisionShape.get(); }
 
-		void setShape(ShapeFormat Shape);
-		ShapeFormat getShape() const { return Shape; }
+        void setShape(ShapeFormat Shape);
 
-		void setDimentions(const btVector3 & Dimentions) { this->Dimentions = Dimentions; }
-		const btVector3& getDimentions() const { return Dimentions; }
+        ShapeFormat getShape() const { return Shape; }
 
-		void setPlaneConstant(float PlaneConstant) { this->PlaneConstant = PlaneConstant; }
-		float getPlaneConstant() const { return PlaneConstant; }
+        void setDimensions(const btVector3 &Dimensions) { this->Dimensions = Dimensions; }
 
-	private:
-		ShapeFormat Shape;
+        const btVector3 &getDimensions() const { return Dimensions; }
 
-		btVector3 Dimentions;
-		float PlaneConstant;
+        void setPlaneConstant(float PlaneConstant) { this->PlaneConstant = PlaneConstant; }
 
-		std::unique_ptr<btCollisionShape> CollisionShape;
-	};
+        float getPlaneConstant() const { return PlaneConstant; }
 
-}
+    private:
+        ShapeFormat Shape;
+
+        btVector3 Dimensions;
+        float PlaneConstant;
+
+        std::unique_ptr<btCollisionShape> CollisionShape;
+    };
+
 }
 

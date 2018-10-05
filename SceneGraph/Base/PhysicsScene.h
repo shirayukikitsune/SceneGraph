@@ -4,45 +4,42 @@
 
 #include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 
-namespace kitsune {
-namespace scenegraph {
+namespace kitsune::scenegraph {
 
-	class PhysicsScene
-		: public Scene
-	{
-	public:
-		PhysicsScene();
-		~PhysicsScene();
+    class PhysicsScene
+            : public Scene {
+    public:
+        PhysicsScene();
 
-		void setGravity(const btVector3 & Gravity);
-		void setFps(float Fps);
+        ~PhysicsScene() override;
 
-		btSoftRigidDynamicsWorld * getWorld();
+        void setGravity(const btVector3 &Gravity);
 
-	protected:
-		virtual void onPreInit();
+        void setFps(float Fps);
 
-		virtual void onUpdate(float DeltaTime);
+        btSoftRigidDynamicsWorld *getWorld();
 
-	private:
-		static void worldTickCallback(btDynamicsWorld *World, btScalar TimeStep);
+    protected:
+        void onPreInit() override;
 
-		updateCallback prePhysicsUpdateEvents;
+        void onUpdate(float DeltaTime) override;
 
-		updateCallback physicsUpdateEvents;
+    private:
+        static void worldTickCallback(btDynamicsWorld *World, btScalar TimeStep);
 
-		std::unique_ptr<btBroadphaseInterface> Broadphase;
-		std::unique_ptr<btCollisionConfiguration> CollisionConfiguration;
-		std::unique_ptr<btCollisionDispatcher> CollisionDispatcher;
-		std::unique_ptr<btConstraintSolver> ConstraintSolver;
-		std::unique_ptr<btSoftRigidDynamicsWorld> DynamicsWorld;
-		std::unique_ptr<btSoftBodySolver> SoftBodySolver;
+        updateCallback prePhysicsUpdateEvents;
 
-		float FrameTime;
-		btVector3 Gravity;
-	};
+        updateCallback physicsUpdateEvents;
+
+        std::unique_ptr<btBroadphaseInterface> Broadphase;
+        std::unique_ptr<btCollisionConfiguration> CollisionConfiguration;
+        std::unique_ptr<btCollisionDispatcher> CollisionDispatcher;
+        std::unique_ptr<btConstraintSolver> ConstraintSolver;
+        std::unique_ptr<btSoftRigidDynamicsWorld> DynamicsWorld;
+        std::unique_ptr<btSoftBodySolver> SoftBodySolver;
+
+        float FrameTime;
+        btVector3 Gravity;
+    };
 
 }
-}
-
-

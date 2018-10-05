@@ -1,85 +1,88 @@
 #pragma once
 
 #include "Callback.h"
+#include "Component.h"
 
 #include <memory>
 #include <map>
 #include <string>
 
-namespace kitsune {
-namespace scenegraph {
+namespace kitsune::scenegraph {
 
-	class Node;
+    class Node;
 
-	class Scene
-		: public std::enable_shared_from_this<Scene>
-	{
-	public:
-		///! The type used for update callbacks
-		typedef auto_callback<void(float)> updateCallback;
+    class Scene
+            : public std::enable_shared_from_this<Scene> {
+    public:
+        ///! The type used for update callbacks
+        typedef auto_callback<void(float)> updateCallback;
 
-		Scene();
-		virtual ~Scene();
+        Scene();
 
-		///! Prepares the scene, creating all associated resources
-		void initialize();
+        virtual ~Scene();
 
-		///! Handles the changes of the scene, propagating to all connected nodes
-		void update(float DeltaTime);
+        ///! Prepares the scene, creating all associated resources
+        void initialize();
 
-		///! Returns the root node of the scene
-		Node * getRootNode() { return RootNode.get(); }
+        ///! Handles the changes of the scene, propagating to all connected nodes
+        void update(float DeltaTime);
 
-		std::shared_ptr<Node> getActiveCamera() { return ActiveCamera.lock(); }
-		void setActiveCamera(std::shared_ptr<Node> Camera) { ActiveCamera = Camera; }
+        ///! Returns the root node of the scene
+        Node *getRootNode() { return RootNode.get(); }
+
+        std::shared_ptr<Node> getActiveCamera() { return ActiveCamera.lock(); }
+
+        void setActiveCamera(const std::shared_ptr<Node> &Camera) { ActiveCamera = Camera; }
 
         ///! Renders the scene
         void render();
 
-		updateCallback::auto_remover_type addPreUpdateEvent(updateCallback::function_type && function);
-		updateCallback::auto_remover_type addPreUpdateEvent(const updateCallback::function_type & function);
+        updateCallback::auto_remover_type addPreUpdateEvent(updateCallback::function_type &&function);
 
-		updateCallback::auto_remover_type addUpdateEvent(updateCallback::function_type && function);
-		updateCallback::auto_remover_type addUpdateEvent(const updateCallback::function_type & function);
+        updateCallback::auto_remover_type addPreUpdateEvent(const updateCallback::function_type &function);
 
-		void addTaggedNode(const std::string & Tag, std::shared_ptr<Node> Node);
-		void removeTaggedNode(const std::string & Tag, std::shared_ptr<Node> Node);
+        updateCallback::auto_remover_type addUpdateEvent(updateCallback::function_type &&function);
 
-		auto findNodesByTag(const std::string & Tag) {
-			return this->TaggedNodes.equal_range(Tag);
-		}
+        updateCallback::auto_remover_type addUpdateEvent(const updateCallback::function_type &function);
 
-	protected:
-		///! Event called right when the scene is asked to initialize.
-		///
-		/// \remarks The root node is not yet initialized
-		virtual void onPreInit() {};
+        void addTaggedNode(const std::string &Tag, std::shared_ptr<Node> Node);
 
-		///! Event called when the scene is fully initialized
-		virtual void onInit() {};
+        void removeTaggedNode(const std::string &Tag, std::shared_ptr<Node> Node);
 
-		///! Event called before the scene update process take place
-		virtual void onPreUpdate(float DeltaTime) {};
+        auto findNodesByTag(const std::string &Tag) {
+            return this->TaggedNodes.equal_range(Tag);
+        }
 
-		///! Event called after the scene update process take place
-		virtual void onUpdate(float DeltaTime) {};
+    protected:
+        ///! Event called right when the scene is asked to initialize.
+        ///
+        /// \remarks The root node is not yet initialized
+        virtual void onPreInit() {};
 
-	private:
-		updateCallback preUpdateEvents;
+        ///! Event called when the scene is fully initialized
+        virtual void onInit() {};
 
-		updateCallback updateEvents;
+        ///! Event called before the scene update process take place
+        virtual void onPreUpdate(float DeltaTime) {};
 
-		///! The root node of the scene
-		///
-		/// \remarks This pointer is guaranteed to be valid (i.e., RootNode != nullptr) while the instance of this scene remains valid
-		std::shared_ptr<Node> RootNode;
+        ///! Event called after the scene update process take place
+        virtual void onUpdate(float DeltaTime) {};
 
-		///! A node that is set as current camera
-		std::weak_ptr<Node> ActiveCamera;
+    private:
+        updateCallback preUpdateEvents;
 
-		///! Nodes with tags
-		std::multimap<std::string, std::weak_ptr<Node>> TaggedNodes;
-	};
+        updateCallback updateEvents;
 
-}
+        ///! The root node of the scene
+        ///
+        /// \remarks This pointer is guaranteed to be valid (i.e., RootNode != nullptr) while the instance of this scene remains valid
+        std::shared_ptr<Node> RootNode;
+
+        ///! A node that is set as current camera
+        std::weak_ptr<Node> ActiveCamera;
+
+        ///! Nodes with tags
+        std::multimap<std::string, std::weak_ptr<Node>> TaggedNodes;
+    };
+
 }

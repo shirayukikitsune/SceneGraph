@@ -3,8 +3,7 @@
 #include "../Base/Component.h"
 #include "../Base/Scene.h"
 
-namespace kitsune {
-namespace scenegraph {
+namespace kitsune::scenegraph {
 
 	class Node;
 
@@ -22,9 +21,6 @@ namespace scenegraph {
             PostPhysics
 		};
 
-		SceneEventComponent();
-		virtual ~SceneEventComponent();
-
 		virtual void onPreUpdate(float DeltaTime) {}
         virtual void onPostUpdate(float DeltaTime) {}
 
@@ -38,5 +34,3 @@ namespace scenegraph {
 	};
 
 }
-}
-

@@ -2,15 +2,18 @@
 
 #include <string>
 
-namespace kitsune {
-namespace scenegraph {
-namespace util {
+namespace kitsune::scenegraph::util {
 
-    unsigned int addFlag(unsigned int flags, unsigned int flag);
-    unsigned int removeFlag(unsigned int flags, unsigned int flag);
+    template <class T>
+    T addFlag(T flags, T flag) {
+        return flags | flag;
+    }
+
+    template <class T>
+    T removeFlag(T flags, T flag) {
+        return flags & ~flag;
+    }
 
     std::string getExtension(const std::string &filename);
 
-}
-}
 }

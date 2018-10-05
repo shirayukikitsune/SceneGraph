@@ -7,55 +7,58 @@
 #include <memory>
 
 #define KIT_SG_COMPONENT(t) \
-	public: \
-		constexpr static std::uint32_t componentNameHash = #t ## _crc32; \
+    public: \
+        constexpr static std::uint32_t componentNameHash = #t ## _crc32; \
         virtual std::uint32_t getComponentNameHash() const override { return componentNameHash; }
 
-namespace kitsune {
-namespace scenegraph {
+namespace kitsune::scenegraph {
 
-	class Scene;
+    class Scene;
 
-	class Component
-	{
+    class Component {
     public:
         constexpr static std::uint32_t componentNameHash = "kitsune::scenegraph::Component"_crc32;
+
         virtual std::uint32_t getComponentNameHash() const { return componentNameHash; }
 
-	public:
-		typedef auto_callback<void(std::weak_ptr<Node>)> onNodeSetCallback;
+    public:
+        typedef auto_callback<void(std::weak_ptr<Node>)> onNodeSetCallback;
 
-		Component();
-		virtual ~Component();
+        Component();
 
-		bool isLocalActive() const { return Active; }
-		bool isActive() const;
-		virtual void setActive(bool State) { Active = State; }
+        virtual ~Component() = default;
+
+        bool isLocalActive() const { return Active; }
+
+        bool isActive() const;
+
+        virtual void setActive(bool State) { Active = State; }
 
         virtual void initialize() {}
 
         virtual void render() {}
 
-		void setNode(std::weak_ptr<Node> Node);
-		std::shared_ptr<Node> getNode();
+        void setNode(std::weak_ptr<Node> Node);
 
-		std::shared_ptr<Scene> getScene();
+        std::shared_ptr<Node> getNode();
 
-		onNodeSetCallback::auto_remover_type addOnNodeSetEvent(onNodeSetCallback::function_type && function);
-		onNodeSetCallback::auto_remover_type addOnNodeSetEvent(const onNodeSetCallback::function_type & function);
+        std::shared_ptr<Scene> getScene();
 
-	private:
+        onNodeSetCallback::auto_remover_type addOnNodeSetEvent(onNodeSetCallback::function_type &&function);
+
+        onNodeSetCallback::auto_remover_type addOnNodeSetEvent(const onNodeSetCallback::function_type &function);
+
+    private:
         std::weak_ptr<Node> ParentNode;
-		
+
         std::weak_ptr<Scene> ParentScene;
 
-		bool Active;
+        bool Active;
 
-		onNodeSetCallback onNodeSetEvent;
+        onNodeSetCallback onNodeSetEvent;
 
-	protected:
-		virtual void onNodeSet() {}
-	};
+    protected:
+        virtual void onNodeSet() {}
+    };
 
-}
 }
