@@ -53,7 +53,7 @@ void ExampleApplication::onInitialized()
         this->Run = false;
     });
     _Application->getEventHandler()->addHandler(sg::events::input::KeyUp, [this](void* data) {
-        SDL_KeyboardEvent *evData = reinterpret_cast<SDL_KeyboardEvent*>(data);
+        auto evData = reinterpret_cast<SDL_KeyboardEvent*>(data);
         if (evData->keysym.sym == SDLK_ESCAPE) {
             this->Run = false;
         }
@@ -80,6 +80,12 @@ void ExampleApplication::onInitialized()
     // Scale the cube by 2.0
     sg::sdl::prefabs::CreateCube(Node, false);
 
+    auto Material = Node->getComponent<sdlg::Material<sdlg::vertex::PositionNormalUVVertex, unsigned short>>();
+    Material->setShininess(64.0f);
+    Material->setSpecularColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    Material->setDiffuseColor(glm::vec4(0.8f, 1.0f, 1.0f, 1.0f));
+    Material->setAmbientColor(glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+
     auto Shader = Node->createComponent<sdlg::DiffuseShader<sdlg::vertex::PositionNormalUVVertex>>();
     Shader->append("example03.vert", sdlg::ShaderType::Vertex);
     Shader->append("example03.frag", sdlg::ShaderType::Fragment);
@@ -90,7 +96,7 @@ void ExampleApplication::onInitialized()
     Node = Scene->getRootNode()->addChildNode();
     Node->setName("Light");
     Light = Node->createComponent<sg::sdl::components::Light>();
-    Light->setColor(glm::vec3(1.0f, 0.8f, 0.8f));
+    Light->setAmbientColor(glm::vec3(1.0f, 0.2f, 0.8f));
     Light->setDirection(glm::normalize(CameraComponent->getLookDirection()));
 
     CurrentScene = Scene;
@@ -113,12 +119,11 @@ void ExampleApplication::onUpdate(const std::chrono::milliseconds & frameTime)
             auto rotation = Node->getLocalRotation();
             auto angles = glm::eulerAngles(rotation);
             angles.z += step;
+            angles.x += step / 2;
             rotation = glm::quat(angles);
             Node->setLocalRotation(rotation);
         }
     }
-
-    Light->setDirection(glm::quat(glm::vec3(0.1f, 0, 0)) * Light->getDirection());
 
     CurrentScene->update(frameTime.count());
 }

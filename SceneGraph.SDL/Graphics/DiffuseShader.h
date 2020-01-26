@@ -69,7 +69,7 @@ protected:
             glUniform1i(textureUniforms[i], i);
 
             if (textures[i]) {
-                mask |= 1 << i;
+                mask |= 1U << i;
             }
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(GL_TEXTURE_2D, textures[i]);
@@ -86,7 +86,9 @@ protected:
             if (auto lightNode = i->second.lock()) {
                 auto light = lightNode->template getComponent<components::Light>();
                 if (light && light->isActive()) {
-                    glUniform3fv(lightColor, 1, &light->getColor()[0]);
+                    glUniform3fv(lightAmbientColor, 1, &light->getAmbientColor()[0]);
+                    glUniform3fv(lightDiffuseColor, 1, &light->getDiffuseColor()[0]);
+                    glUniform3fv(lightSpecularColor, 1, &light->getSpecularColor()[0]);
                     glUniform3fv(lightDirection, 1, &light->getDirection()[0]);
                 }
             }
@@ -115,7 +117,9 @@ protected:
         diffuseColor = glGetUniformLocation(shaderProgram, "diffuseColor");
         specularColor = glGetUniformLocation(shaderProgram, "specularColor");
 
-        lightColor = glGetUniformLocation(shaderProgram, "lightColor");
+        lightAmbientColor = glGetUniformLocation(shaderProgram, "lightAmbientColor");
+        lightDiffuseColor = glGetUniformLocation(shaderProgram, "lightDiffuseColor");
+        lightSpecularColor = glGetUniformLocation(shaderProgram, "lightSpecularColor");
         lightDirection = glGetUniformLocation(shaderProgram, "lightDirection");
 
         modelView = glGetUniformLocation(shaderProgram, "modelView");
@@ -133,7 +137,9 @@ private:
     GLint diffuseColor;
     GLint specularColor;
 
-    GLint lightColor;
+    GLint lightAmbientColor;
+    GLint lightDiffuseColor;
+    GLint lightSpecularColor;
     GLint lightDirection;
 
     GLint modelView;

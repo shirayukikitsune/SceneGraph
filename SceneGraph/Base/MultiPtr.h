@@ -16,25 +16,26 @@ namespace kitsune::scenegraph {
         typedef MultiPtr<T, C, D> _Myt;
         typedef std::unique_ptr<T> child_ptr;
         typedef T *pointer;
+        typedef T const * const_pointer;
         static const delete_condition condition = C;
 
         constexpr MultiPtr() noexcept : ptr(nullptr), count(0) {
         }
 
-        constexpr MultiPtr(std::nullptr_t) noexcept : MultiPtr() {
+        constexpr explicit MultiPtr(std::nullptr_t) noexcept : MultiPtr() {
         }
 
         explicit MultiPtr(pointer p) noexcept : ptr(p) {
-            count = 0;
+            count = 1;
         }
 
         MultiPtr(pointer p, typename std::conditional<std::is_reference<D>::value, D, const D &> del) noexcept : ptr(p),
                                                                                                                  deleter(del) {
-            count = 0;
+            count = 1;
         }
 
         MultiPtr(pointer p, typename std::remove_reference<D>::type &&del) noexcept : ptr(p), deleter(del) {
-            count = 0;
+            count = 1;
         }
 
         MultiPtr(MultiPtr &&p) noexcept {
@@ -50,15 +51,19 @@ namespace kitsune::scenegraph {
 
         ~MultiPtr() {
             if (get() != pointer())
-                deleter(get());
+                call_deleter(get());
         }
 
         typename std::add_lvalue_reference<T>::type operator*() const {
             return *get();
         }
 
-        pointer operator->() const noexcept {
-            return std::pointer_traits<pointer>::pointer_to(*this);
+        const_pointer operator->() const noexcept {
+            return std::pointer_traits<const pointer>::pointer_to(*ptr);
+        }
+
+        pointer operator->() noexcept {
+            return std::pointer_traits<pointer>::pointer_to(*ptr);
         }
 
         pointer get() const noexcept {
@@ -77,7 +82,7 @@ namespace kitsune::scenegraph {
             pointer old = get();
             this->ptr = p;
             if (old != pointer())
-                deleter(old);
+                call_deleter(old);
             count = this->ptr ? 1 : 0;
         }
 
@@ -109,6 +114,16 @@ namespace kitsune::scenegraph {
         pointer ptr;
         D deleter;
         int count;
+
+        template <typename DT = D>
+        typename std::enable_if<std::is_pointer_v<DT>>::type call_deleter(pointer ptr) {
+            (*deleter)(ptr);
+        }
+
+        template <typename DT = D>
+        typename std::enable_if<!std::is_pointer_v<DT>>::type call_deleter(pointer ptr) {
+            deleter(ptr);
+        }
     };
 
 }

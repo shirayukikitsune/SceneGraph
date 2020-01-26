@@ -9,12 +9,17 @@ namespace kitsune::scenegraph::sdl::components {
 class Light : public Component {
     KIT_SG_COMPONENT(kitsune::scenegraph::sdl::components::Light);
 
-    glm::vec3 color;
+    glm::vec3 ambientColor;
+    glm::vec3 diffuseColor;
+    glm::vec3 specularColor;
     glm::vec3 direction;
 
 public:
     Light()
-        : color(1.0f), direction(0.0f)
+        : ambientColor(1.0f, 1.0f, 1.0f),
+          diffuseColor(1.0f, 1.0f, 1.0f),
+          specularColor(1.0f, 1.0f, 1.0f),
+          direction(0.0f, 0.0f, 0.0f)
     {}
 
     void setDirection(const glm::vec3 &direction)
@@ -27,14 +32,34 @@ public:
         return this->direction;
     }
 
-    void setColor(const glm::vec3 &color)
+    void setAmbientColor(const glm::vec3 &color)
     {
-        this->color = color;
+        this->ambientColor = color;
     }
 
-    const glm::vec3& getColor()
+    const glm::vec3& getAmbientColor()
     {
-        return this->color;
+        return this->ambientColor;
+    }
+
+    void setDiffuseColor(const glm::vec3 &color)
+    {
+        this->diffuseColor = color;
+    }
+
+    const glm::vec3& getDiffuseColor()
+    {
+        return this->diffuseColor;
+    }
+
+    void setSpecularColor(const glm::vec3 &color)
+    {
+        this->specularColor = color;
+    }
+
+    const glm::vec3& getSpecularColor()
+    {
+        return this->specularColor;
     }
 
 protected:

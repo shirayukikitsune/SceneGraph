@@ -36,7 +36,11 @@ namespace kitsune::scenegraph::sdl::graphics {
         typedef std::unique_ptr<ArrayBuffer<IndexType, 1>> IndexBufferType;
         typedef std::unique_ptr<ArrayBuffer<VertexType, 1>> VertexBufferType;
 
-        Material() : ambientColor(1.0f), diffuseColor(1.0f), specularColor(1.0f) {
+        Material() :
+            ambientColor(1.0f, 1.0f, 1.0f, 1.0f),
+            diffuseColor(1.0f, 1.0f, 1.0f, 1.0f),
+            specularColor(1.0f, 1.0f, 1.0f, 1.0f) {
+            vertexArray = 0;
             shininess = 1.0f;
         }
 
